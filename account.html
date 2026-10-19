@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Account</title>
+    
+    <!-- Google Font နဲ့ CSS ချိတ်ဆက်ခြင်း -->
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Account Page အတွက် သီးသန့် နေရာချထားမှုများ */
+        .account-container { padding: 20px; text-align: center; }
+        
+        .profile-img { 
+            width: 100px; height: 100px; border-radius: 50%; 
+            background: var(--nav-bg); margin: 0 auto 20px; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 45px; border: 3px solid var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .info-box { 
+            background: var(--nav-bg); padding: 20px; border-radius: 15px; 
+            margin-bottom: 20px; text-align: left; 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .info-box p { 
+            margin: 0 0 12px 0; font-size: 16px; color: var(--text-muted); 
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;
+        }
+        .info-box p:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .info-box span { color: var(--text-main); font-weight: bold; }
+
+        .renew-box { 
+            background: var(--nav-bg); padding: 20px; border-radius: 15px; 
+            margin-bottom: 20px; border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .renew-box h3 { color: var(--primary); margin-top: 0; margin-bottom: 10px; text-align: left; }
+        .renew-box p { font-size: 14px; color: var(--text-muted); text-align: left; margin-bottom: 15px; }
+        
+        .btn-group { display: flex; gap: 15px; justify-content: center; }
+        .btn { 
+            flex: 1; padding: 12px; border-radius: 10px; text-decoration: none; 
+            color: white; font-weight: bold; display: flex; align-items: center; 
+            justify-content: center; gap: 8px; font-size: 15px; transition: 0.2s;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-viber { background: #7360f2; box-shadow: 0 4px 10px rgba(115, 96, 242, 0.3); }
+        .btn-tg { background: #0088cc; box-shadow: 0 4px 10px rgba(0, 136, 204, 0.3); }
+        
+        .logout-btn { 
+            background: rgba(255, 51, 51, 0.1); 
+            border: 1px solid #ff3333;
+            color: #ff3333; width: 100%; padding: 15px; border-radius: 12px; 
+            font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
+            transition: 0.2s;
+        }
+        .logout-btn:active { background: #ff3333; color: white; transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div style="padding: 0 20px 20px; font-size: 24px; font-weight: bold; color: #fff;">Menu</div>
+        <a href="index.html"><span class="icon">🏠</span> Home</a>
+        <a href="categories.html"><span class="icon">🎬</span> Categories</a>
+        <a href="models.html"><span class="icon">👤</span> Models</a>
+        <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
+        <hr style="border-color: #333; margin: 10px 0;">
+        
+        <a href="login.html" id="navLogin" style="display: none;"><span class="icon">🔑</span> Login</a>
+        <a href="account.html" id="navAccount" class="active" style="color: #00ff88;"><span class="icon">👤</span> My Account</a>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <h1 class="logo">My Account</h1>
+    </div>
+
+    <!-- Content -->
+    <div class="account-container">
+        <div class="profile-img">👤</div>
+        
+        <div class="info-box">
+            <p>Username <span id="accUsername">...</span></p>
+            <p>VIP Key <span id="accKey">******</span></p>
+            <p>Expired <span id="accExpired" style="color: var(--primary);">...</span></p>
+        </div>
+
+        <div class="renew-box">
+            <h3>Renew Key (သက်တမ်းတိုးရန်)</h3>
+            <p>အောက်ပါ Button များမှတဆင့် ဆက်သွယ်ပြီး Key သက်တမ်းတိုးနိုင်ပါသည်။</p>
+            <div class="btn-group">
+                <!-- မင်းရဲ့ ဖုန်းနံပါတ်နဲ့ Telegram Link ကို ဒီမှာ ထည့်ပါ -->
+                <a href="viber://chat?number=+959xxxxxxxxx" class="btn btn-viber">📞 Viber</a>
+                <a href="https://t.me/yourusername" class="btn btn-tg">✈️ Telegram</a>
+            </div>
+        </div>
+
+        <button class="logout-btn" onclick="logout()">Logout ထွက်မည်</button>
+    </div>
+
+    <script>
+        const API_URL = "https://myhubapp.dathalay1.workers.dev"; // မင်း Worker Link
+        
+        // Account Page ကို ဝင်လာတာနဲ့ အချက်အလက်တွေ စစ်မယ်
+        if (!localStorage.getItem('username')) {
+            window.location.href = 'login.html'; // မဝင်ထားရင် Login ပို့မယ်
+        } else {
+            document.getElementById('navLogin').style.display = 'none';
+            document.getElementById('navAccount').style.display = 'flex';
+            document.getElementById('accUsername').innerText = localStorage.getItem('username');
+            document.getElementById('accExpired').innerText = localStorage.getItem('expired_date');
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
+        }
+
+        async function logout() {
+            const username = localStorage.getItem('username');
+            const btn = document.querySelector('.logout-btn');
+            
+            btn.innerText = "ထွက်နေပါသည်...";
+            btn.disabled = true;
+
+            // Database ထဲက Device ID ကို ဖျက်မယ်
+            try {
+                await fetch(`${API_URL}/api/logout`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username })
+                });
+            } catch (e) { console.log(e); }
+
+            // Browser ထဲက Data တွေ ရှင်းမယ်
+            localStorage.removeItem('username');
+            localStorage.removeItem('expired_date');
+            // device_id ကို မဖျက်ပါဘူး (ဒါမှ ပြန်ဝင်ရင် အလွယ်တကူ ဝင်လို့ရမှာ)
+            
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
