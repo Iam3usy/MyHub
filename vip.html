@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIP Videos</title>
+    
+    <!-- Google Font နဲ့ CSS ချိတ်ဆက်ခြင်း -->
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* VIP Page အတွက် သီးသန့် အရောင် (ရွှေရောင်) */
+        .logo { color: gold !important; }
+        .sidebar a.active-vip { color: gold !important; border-left-color: gold !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div style="padding: 0 20px 20px; font-size: 24px; font-weight: bold; color: #fff;">Menu</div>
+        <a href="index.html"><span class="icon">🏠</span> Home</a>
+        <a href="categories.html"><span class="icon">🎬</span> Categories</a>
+        <a href="models.html"><span class="icon">👤</span> Models</a>
+        <a href="vip.html" class="active-vip"><span class="icon">👑</span> VIP Videos</a>
+        <hr style="border-color: #333; margin: 10px 0;">
+        
+        <!-- Login ဝင်ထားလား မဝင်ထားဘူး စစ်ပြီး ပြမယ် -->
+        <a href="login.html" id="navLogin" style="color: #00d2ff;"><span class="icon">🔑</span> Login</a>
+        <a href="account.html" id="navAccount" style="display: none; color: #00ff88;"><span class="icon">👤</span> My Account</a>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <h1 class="logo">VIP Videos</h1>
+    </div>
+
+    <!-- Content -->
+    <div class="container">
+        <h2 class="section-title" style="color: gold;">ရွှေရောင် VIP ဇာတ်ကားများ</h2>
+        <div class="grid" id="videoGrid">
+            <!-- Loading Spinner Center -->
+            <div class="loading-wrapper" style="grid-column: span 2;">
+                <div class="spinner"></div>
+                <p>စစ်ဆေးနေပါသည်...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Error Popup -->
+    <div id="customPopup">
+        <div class="popup-content">
+            <div class="popup-icon">⚠️</div>
+            <div class="popup-title">Error တက်နေပါတယ်</div>
+            <div class="popup-message" id="popupMsg">ဒေတာ ဆွဲထုတ်မရပါဘူး။</div>
+            <button class="popup-btn" onclick="retryLoad()">ပြန်ကြိုးစားမည် (Retry)</button>
+        </div>
+    </div>
+
+    <!-- Player Modal -->
+    <div id="playerModal">
+        <button id="closeBtn" onclick="closePlayer()">✕</button>
+        <video id="mainPlayer" controls playsinline></video>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const API_URL = "https://myhubapp.dathalay1.workers.dev"; // မင်း Worker Link
+        
+        // Sidebar Login/Account စစ်ဆေး
+        if (localStorage.getItem('username')) {
+            document.getElementById('navLogin').style.display = 'none';
+            document.getElementById('navAccount').style.display = 'flex';
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
+        }
+
+        // Error Popup ပြမယ့် Function
+        function showErrorPopup(message) {
+            document.getElementById('popupMsg').innerText = message;
+            document.getElementById('customPopup').style.display = 'flex';
+        }
+
+        // Retry နှိပ်ရင် လုပ်မယ့်အလုပ်
+        function retryLoad() {
+            document.getElementById('customPopup').style.display = 'none';
+            document.getElementById('videoGrid').innerHTML = `
+                <div class="loading-wrapper" style="grid-column: span 2;">
+                    <div class="spinner"></div>
+                    <p>စစ်ဆေးနေပါသည်...</p>
+                </div>`;
+            loadVipVideos();
+        }
+
+        // VIP စစ်ဆေးပြီး ဗီဒီယိုဆွဲမယ်
+        async function loadVipVideos() {
+            // ၁။ Login ဝင်ထားရဲ့လား အရင်စစ်မယ်
+            if (!localStorage.getItem('username')) {
+                // မဝင်ထားရင် Popup ပြပြီး Login ကို ပို့မယ်
+                const goLogin = confirm("VIP ကြည့်ရှုရန် အကောင့်ဝင်ရန် လိုအပ်ပါသည်။\nအကောင့်ဝင်ရန် သွားမလား?");
+                if(goLogin) {
+                    window.location.href = 'login.html';
+                } else {
+                    window.location.href = 'index.html'; // မဝင်ချင်ရင် Home ပြန်ပို့မယ်
+                }
+                return;
+            }
+
+            // ၂။ Login ဝင်ထားရင် ဗီဒီယိုတွေ ဆွဲမယ်
+            const grid = document.getElementById('videoGrid');
+            
+            try {
+                const res = await fetch(`${API_URL}/api/videos/vip`);
+                if (!res.ok) throw new Error("ဆာဗာကနေ ဒေတာ မပေးနိုင်ပါဘူး");
+
+                const videos = await res.json();
+                grid.innerHTML = ''; // Loading ကို ဖျက်မယ်
+                
+                if(videos.length === 0) {
+                    grid.innerHTML = '<p style="grid-column: span 2; text-align:center; color:#888;">VIP ဇာတ်ကား မရှိသေးပါ။</p>';
+                    return;
+                }
+
+                videos.forEach(video => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => playVideo(video.file_id);
+                    card.innerHTML = `
+                        <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
+                        <div class="title" style="color: gold;">${video.title} 👑</div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                grid.innerHTML = ''; 
+                showErrorPopup(error.message); 
+            }
+        }
+
+        // ဗီဒီယိုဖွင့်ခြင်း
+        function playVideo(fileId) {
+            const modal = document.getElementById('playerModal');
+            const video = document.getElementById('mainPlayer');
+            const streamUrl = `${API_URL}/stream?file_id=${fileId}`;
+            modal.style.display = 'flex';
+
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(streamUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
+                window.currentHls = hls;
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = streamUrl;
+                video.addEventListener('loadedmetadata', function() { video.play(); });
+            }
+        }
+
+        function closePlayer() {
+            const modal = document.getElementById('playerModal');
+            const video = document.getElementById('mainPlayer');
+            modal.style.display = 'none';
+            video.pause(); 
+            video.src = ''; 
+            if(window.currentHls) window.currentHls.destroy();
+        }
+
+        // စာမျက်နှာ စတင်တာနဲ့ အလုပ်လုပ်မယ်
+        loadVipVideos();
+    </script>
+</body>
+</html>
