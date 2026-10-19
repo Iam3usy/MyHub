@@ -1,0 +1,200 @@
+/* style.css - Premium Dark UI */
+
+@import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Poppins:wght@400;600&display=swap');
+
+:root {
+    --bg-base: #09090b;
+    --bg-surface: rgba(25, 25, 30, 0.7);
+    --primary: #ff0050;
+    --primary-glow: rgba(255, 0, 80, 0.4);
+    --text-main: #f8f8f8;
+    --text-muted: #9ca3af;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --nav-height: 65px;
+}
+
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-tap-highlight-color: transparent;
+}
+
+body { 
+    font-family: 'Padauk', 'Poppins', sans-serif; 
+    background-color: var(--bg-base);
+    /* နောက်ခံမှာ အနီရောင် အလင်းရောင် လေးတွေ ထည့်ထားတယ် */
+    background-image: radial-gradient(circle at 50% 0%, rgba(255, 0, 80, 0.15) 0%, transparent 50%);
+    color: var(--text-main); 
+    min-height: 100vh;
+    padding-bottom: calc(var(--nav-height) + 20px);
+    overflow-x: hidden;
+}
+
+/* --- Top Navbar (Glassmorphism) --- */
+.navbar { 
+    display: flex; align-items: center; padding: 15px 20px; 
+    background: rgba(9, 9, 11, 0.8); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid var(--border-color);
+    height: var(--nav-height);
+}
+.menu-btn { font-size: 24px; color: var(--text-main); background: none; border: none; cursor: pointer; margin-right: 15px; transition: 0.2s; }
+.menu-btn:active { transform: scale(0.9); }
+.logo { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600; color: var(--text-main); letter-spacing: 1px; }
+.logo span { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+
+/* --- Sidebar --- */
+.sidebar { 
+    position: fixed; top: 0; left: -280px; width: 260px; height: 100%; 
+    background: rgba(15, 15, 18, 0.95); backdrop-filter: blur(20px);
+    z-index: 200; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    padding-top: 20px; border-right: 1px solid var(--border-color);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+}
+.sidebar.open { left: 0; }
+.sidebar a { 
+    display: flex; align-items: center; padding: 16px 20px; color: var(--text-muted); 
+    text-decoration: none; font-size: 16px; transition: 0.3s; margin: 4px 10px; border-radius: 10px;
+}
+.sidebar a:hover, .sidebar a.active { 
+    background: rgba(255, 255, 255, 0.05); color: var(--text-main); 
+    box-shadow: inset 0 0 15px rgba(255, 0, 80, 0.1);
+}
+.sidebar a.active { font-weight: bold; color: var(--primary); }
+.sidebar .icon { margin-right: 15px; font-size: 20px; }
+
+/* Overlay */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 150; display: none; backdrop-filter: blur(5px); }
+.overlay.show { display: block; }
+
+/* --- Content Grid --- */
+.container { padding: 15px 20px; }
+.section-title { font-size: 18px; margin-bottom: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+.section-title::before { content: ''; width: 4px; height: 18px; background: var(--primary); border-radius: 2px; }
+
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.card { 
+    background: var(--bg-surface); border-radius: 16px; overflow: hidden; cursor: pointer; 
+    transition: all 0.3s ease; position: relative;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.card:hover, .card:active { 
+    transform: translateY(-3px) scale(0.98); 
+    border-color: rgba(255, 0, 80, 0.4);
+    box-shadow: 0 8px 20px var(--primary-glow);
+}
+.card video, .card img { 
+    width: 100%; height: 160px; object-fit: cover; background: #000; pointer-events: none; 
+    border-bottom: 1px solid var(--border-color);
+}
+.card .title { 
+    padding: 12px; font-size: 14px; font-weight: 700; color: var(--text-main);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* --- Loading Spinner Center --- */
+.loading-wrapper { 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    height: 50vh; color: var(--primary); font-weight: bold;
+}
+.spinner { 
+    width: 50px; height: 50px; 
+    border: 4px solid rgba(255, 0, 80, 0.1); 
+    border-top-color: var(--primary); border-radius: 50%; 
+    animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; 
+    margin-bottom: 15px;
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- Bottom Navigation Bar (Glassmorphism) --- */
+.bottom-nav {
+    position: fixed; bottom: 0; width: 100%; 
+    background: rgba(15, 15, 18, 0.85); backdrop-filter: blur(20px);
+    display: flex; justify-content: space-around; padding: 10px 0; height: var(--nav-height);
+    border-top: 1px solid var(--border-color); z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom); /* ဖုန်း Gesture Bar အတွက် */
+}
+.bottom-nav a { 
+    color: var(--text-muted); text-decoration: none; font-size: 11px; 
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    transition: 0.3s; width: 25%; justify-content: center;
+}
+.bottom-nav a.active { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+.bottom-nav a i, .bottom-nav a span { font-size: 22px; margin-bottom: 2px; transition: 0.3s; }
+.bottom-nav a.active span { transform: translateY(-3px); }
+
+/* --- Player Modal --- */
+#playerModal { 
+    display: none; position: fixed; inset: 0; background: #000; z-index: 1000; 
+    flex-direction: column; justify-content: center; 
+}
+#mainPlayer { width: 100%; max-height: 100vh; outline: none; }
+#closeBtn { 
+    position: absolute; top: 20px; right: 20px; color: white; font-size: 20px; 
+    cursor: pointer; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); 
+    border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(10px); transition: 0.2s;
+}
+#closeBtn:active { background: rgba(255, 255, 255, 0.3); transform: scale(0.9); }
+
+/* --- Forms (Login/Admin) --- */
+.form-box { 
+    background: var(--bg-surface); backdrop-filter: blur(15px); 
+    padding: 30px 20px; border-radius: 20px; 
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin: 20px;
+}
+.form-box input { 
+    width: 100%; padding: 15px; margin: 10px 0; 
+    background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); 
+    color: white; border-radius: 12px; font-family: 'Padauk', sans-serif; font-size: 16px;
+    transition: 0.3s;
+}
+.form-box input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+.form-box button { 
+    width: 100%; padding: 15px; 
+    background: linear-gradient(135deg, #ff0050, #ff4d80); 
+    color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; 
+    margin-top: 15px; font-family: 'Padauk', sans-serif;
+    box-shadow: 0 5px 15px var(--primary-glow);
+    transition: 0.3s;
+}
+.form-box button:active { transform: scale(0.96); box-shadow: 0 2px 5px var(--primary-glow); }
+
+/* --- Custom Error Popup --- */
+#customPopup {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); 
+    backdrop-filter: blur(5px); z-index: 9999;
+    display: none; justify-content: center; align-items: center;
+}
+
+.popup-content {
+    background: var(--nav-bg); border: 1px solid var(--border-color);
+    padding: 25px 20px; border-radius: 20px; width: 85%; max-width: 350px;
+    text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.popup-icon { font-size: 40px; margin-bottom: 10px; }
+.popup-title { font-size: 18px; font-weight: bold; color: var(--text-main); margin-bottom: 10px; }
+.popup-message { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+
+.popup-btn {
+    width: 100%; padding: 12px; 
+    background: linear-gradient(135deg, #ff0050, #ff4d80);
+    color: white; border: none; border-radius: 10px; 
+    font-weight: bold; font-size: 16px; cursor: pointer;
+    box-shadow: 0 5px 15px var(--primary-glow);
+}
+.popup-btn:active { transform: scale(0.96); }
