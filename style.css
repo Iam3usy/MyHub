@@ -128,9 +128,18 @@ a { text-decoration: none; color: inherit; }
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 .card:hover, .card:active { transform: translateY(-3px) scale(0.98); border-color: rgba(255, 0, 80, 0.4); box-shadow: 0 8px 20px var(--primary-glow); }
-.card video, .card img { 
+
+.card video{ 
     width: 100%; 
-    aspect-ratio: 3 / 4; 
+    aspect-ratio: 16 / 9; 
+    object-fit: cover; 
+    background: #000; 
+    pointer-events: none; 
+    border-bottom: 1px solid var(--border-color);
+}
+.card img { 
+    width: 100%; 
+    aspect-ratio: 3 / 4 ; 
     object-fit: cover; 
     background: #000; 
     pointer-events: none; 
@@ -182,4 +191,4 @@ a { text-decoration: none; color: inherit; }
     background: linear-gradient(135deg, #ffd700, #ffaa00); /* VIP မို့ ရွှေရောင် */
     color: #000; font-weight: bold;
     box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-}
+           }
