@@ -66,14 +66,12 @@
     <video id="mainPlayer" controls playsinline></video>
 </div>
 
-<!-- Plyr JS & Hls.js ကို ချိတ်ဆက်ခြင်း -->
+<!-- Plyr JS ကို ချိတ်ဆက်ခြင်း -->
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
     const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
     let player; 
-    let currentHls = null; // Hls ကို သိမ်းထားဖို့
 
     // Sidebar စစ်ဆေးခြင်း
     if (localStorage.getItem('username')) {
@@ -132,43 +130,29 @@
         }
     }
 
-    // ဗီဒီယို ဖွင့်ခြင်း (HLS နဲ့ Plyr ကို တွဲသုံးထားသည်)
+    // ဗီဒီယို ဖွင့်ခြင်း (အရင် UI Player အတိုင်း ပြန်ပြင်ထားသည်)
     function playVideo(fileId) {
-    const modal = document.getElementById('playerModal');
-    const video = document.getElementById('mainPlayer');
-    
-    // 🔴 id အစား file_id ကို သုံးပြီး ခေါ်မယ်
-    const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`; 
+        const modal = document.getElementById('playerModal');
+        const video = document.getElementById('mainPlayer');
+        
+        // 🔴 အဓိက ပြင်ဆင်ချက် - id အစား file_id ကို သုံးထားသည်
+        const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`; 
 
-    modal.style.display = 'flex';
+        modal.style.display = 'flex';
 
-    // Player အဟောင်း ရှိရင် ဖျက်မယ်
-    if (player) {
-        player.destroy(); 
-        player = null;
-    }
-
-    // Hls မလိုတော့ဘဲ ရိုးရိုး Video အနေနဲ့ ဖွင့်မယ်
-    video.src = streamUrl;
-    
-    player = new Plyr(video, {
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
-    });
-    
-    player.play().catch(e => console.log("Autoplay မရပါ", e));
-}
-
-            // Error ရှိရင် Console မှာ ပြမယ်
-            currentHls.on(Hls.Events.ERROR, function (event, data) {
-                console.error("HLS Error:", data);
-            });
-
-        } 
-        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = streamUrl;
-            player = new Plyr(video);
-            player.play();
+        if (player) {
+            player.destroy(); 
+            player = null;
         }
+
+        video.src = streamUrl;
+        
+        // Plyr ကို အသုံးပြုပြီး Player ဖွင့်မယ်
+        player = new Plyr(video, {
+            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+        });
+        
+        player.play().catch(e => console.log("Autoplay blocked", e));
     }
 
     // Player ပိတ်ခြင်း
