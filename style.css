@@ -118,6 +118,9 @@ a { text-decoration: none; color: inherit; }
 .section-title::before { content: ''; width: 4px; height: 18px; background: var(--primary); border-radius: 2px; }
 
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.video-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
 .card { 
     background: var(--bg-surface); border-radius: 12px; overflow: hidden; cursor: pointer; 
     transition: all 0.3s ease; position: relative;
@@ -174,6 +177,13 @@ a { text-decoration: none; color: inherit; }
     padding: 25px 20px; border-radius: 20px; width: 85%; max-width: 350px;
     text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#vipPopup .popup-btn {
+    background: linear-gradient(135deg, #ffd700, #ffaa00); /* VIP မို့ ရွှေရောင် */
+    color: #000; font-weight: bold;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+}
+-bezier(0.175, 0.885, 0.32, 1.275);
 }
 #vipPopup .popup-btn {
     background: linear-gradient(135deg, #ffd700, #ffaa00); /* VIP မို့ ရွှေရောင် */
