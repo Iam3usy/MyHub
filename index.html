@@ -116,7 +116,7 @@
 
             videos.forEach(video => {
                 const card = document.createElement('div');
-                card.className = 'card';
+                card.className = 'card video-card';
                 card.onclick = () => playVideo(video.file_id);
                 card.innerHTML = `
                     <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
