@@ -13,16 +13,23 @@
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <div style="padding: 0 20px 20px; font-size: 24px; font-weight: bold; color: #fff;">Menu</div>
-        <a href="index.html"><span class="icon">🏠</span> Home</a>
-        <a href="categories.html" class="active"><span class="icon">🎬</span> Categories</a>
-        <a href="models.html"><span class="icon">👤</span> Models</a>
-        <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
-        <hr style="border-color: #333; margin: 10px 0;">
-        
-        <!-- Login ဝင်ထားလား မဝင်ထားဘူး စစ်ပြီး ပြမယ် -->
-        <a href="login.html" id="navLogin" style="color: #00d2ff;"><span class="icon">🔑</span> Login</a>
-        <a href="account.html" id="navAccount" style="display: none; color: #00ff88;"><span class="icon">👤</span> My Account</a>
+        <div class="sidebar-header">
+            <div class="profile-img">👤</div>
+            <h2>MyVideo</h2>
+            <p>Premium Streaming</p>
+        </div>
+
+        <div class="sidebar-links">
+            <a href="index.html"><span class="icon">🏠</span> Home </a>
+            <a href="models.html"><span class="icon">👤</span> Models</a>
+            <a href="categories.html" class="active"><span class="icon">🎬</span> Categories</a>
+            <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
+            
+            <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+            
+            <a href="login.html" id="navLogin" style="color: #00d2ff;"><span class="icon">🔑</span> Login</a>
+            <a href="account.html" id="navAccount" style="display: none; color: #00ff88;"><span class="icon">⚙️</span> My Account</a>
+        </div>
     </div>
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
@@ -34,12 +41,12 @@
 
     <!-- Content -->
     <div class="container">
-        <h2 class="section-title">အမျိုးအစားများ</h2>
+        <!-- 🔴 ID ကို categoryGrid လို့ ပြင်ထားပါတယ် -->
         <div class="grid" id="categoryGrid">
             <!-- Loading Spinner Center -->
             <div class="loading-wrapper" style="grid-column: span 3;">
                 <div class="spinner"></div>
-                <p>ခဏစောင့်ပါ...</p>
+                <p>Please Wait...</p>
             </div>
         </div>
     </div>
@@ -48,18 +55,10 @@
     <div id="customPopup">
         <div class="popup-content">
             <div class="popup-icon">⚠️</div>
-            <div class="popup-title">Error တက်နေပါတယ်</div>
-            <div class="popup-message" id="popupMsg">ဒေတာ ဆွဲထုတ်မရပါဘူး။</div>
-            <button class="popup-btn" onclick="retryLoad()">ပြန်ကြိုးစားမည် (Retry)</button>
+            <div class="popup-title">Error</div>
+            <div class="popup-message" id="popupMsg">Cannot connect to the server</div>
+            <button class="popup-btn" onclick="retryLoad()">Retry</button>
         </div>
-    </div>
-
-    <!-- Bottom Nav (Optional - App ပုံစံအတွက်) -->
-    <div class="bottom-nav">
-        <a href="index.html">🏠<br>Home</a>
-        <a href="categories.html" class="active">🎬<br>Category</a>
-        <a href="models.html">👤<br>Models</a>
-        <a href="vip.html">👑<br>VIP</a>
     </div>
 
     <script>
@@ -89,7 +88,7 @@
             document.getElementById('categoryGrid').innerHTML = `
                 <div class="loading-wrapper" style="grid-column: span 3;">
                     <div class="spinner"></div>
-                    <p>ခဏစောင့်ပါ...</p>
+                    <p>Please Wait...</p>
                 </div>`;
             loadCategories();
         }
@@ -100,7 +99,7 @@
             
             try {
                 const res = await fetch(`${API_URL}/api/categories`);
-                if (!res.ok) throw new Error("ဆာဗာကနေ ဒေတာ မပေးနိုင်ပါဘူး");
+                if (!res.ok) throw new Error("Server Error");
 
                 const cats = await res.json();
                 grid.innerHTML = ''; // Loading ကို ဖျက်မယ်
