@@ -81,7 +81,7 @@ a {
 .section-title { font-size: 18px; margin-bottom: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
 .section-title::before { content: ''; width: 4px; height: 18px; background: var(--primary); border-radius: 2px; }
 
-.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .card { 
     background: var(--bg-surface); border-radius: 16px; overflow: hidden; cursor: pointer; 
     transition: all 0.3s ease; position: relative;
@@ -94,11 +94,11 @@ a {
     box-shadow: 0 8px 20px var(--primary-glow);
 }
 .card video, .card img { 
-    width: 100%; height: 160px; object-fit: cover; background: #000; pointer-events: none; 
+    width: 100%; height: 150px; object-fit: cover; background: #000; pointer-events: none; 
     border-bottom: 1px solid var(--border-color);
 }
 .card p, .card .title { 
-    padding: 12px; font-size: 14px; font-weight: 700; color: var(--text-main);
+    padding: 8px 4px; font-size: 14px; font-weight: 700; color: var(--text-main);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     text-align: center; /* စာသားကို အလယ်ညှိမယ် */
 }
