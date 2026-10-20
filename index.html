@@ -134,28 +134,29 @@
 
     // ဗီဒီယို ဖွင့်ခြင်း (HLS နဲ့ Plyr ကို တွဲသုံးထားသည်)
     function playVideo(fileId) {
-        const modal = document.getElementById('playerModal');
-        const video = document.getElementById('mainPlayer');
-        const streamUrl = `${API_URL}/stream?id=${encodeURIComponent(fileId)}`; 
+    const modal = document.getElementById('playerModal');
+    const video = document.getElementById('mainPlayer');
+    
+    // 🔴 id အစား file_id ကို သုံးပြီး ခေါ်မယ်
+    const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`; 
 
-        modal.style.display = 'flex';
+    modal.style.display = 'flex';
 
-        // အရင်က Player နဲ့ Hls ရှိရင် အရင်ရှင်းမယ်
-        if (player) { player.destroy(); player = null; }
-        if (currentHls) { currentHls.destroy(); currentHls = null; }
+    // Player အဟောင်း ရှိရင် ဖျက်မယ်
+    if (player) {
+        player.destroy(); 
+        player = null;
+    }
 
-        if (Hls.isSupported()) {
-            currentHls = new Hls();
-            currentHls.loadSource(streamUrl);
-            currentHls.attachMedia(video);
-            
-            // m3u8 ဖတ်ပြီးမှ Player ကို ဆောက်မယ်
-            currentHls.on(Hls.Events.MANIFEST_PARSED, function() {
-                player = new Plyr(video, {
-                    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
-                });
-                player.play().catch(e => console.log("Autoplay blocked", e));
-            });
+    // Hls မလိုတော့ဘဲ ရိုးရိုး Video အနေနဲ့ ဖွင့်မယ်
+    video.src = streamUrl;
+    
+    player = new Plyr(video, {
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+    });
+    
+    player.play().catch(e => console.log("Autoplay မရပါ", e));
+}
 
             // Error ရှိရင် Console မှာ ပြမယ်
             currentHls.on(Hls.Events.ERROR, function (event, data) {
