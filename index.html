@@ -130,39 +130,39 @@
         }
     }
 
-    // ဗီဒီယို ဖွင့်ခြင်း (အရင် UI Player အတိုင်း ပြန်ပြင်ထားသည်)
-    function playVideo(fileId) {
-        const modal = document.getElementById('playerModal');
-        const video = document.getElementById('mainPlayer');
-        
-        // 🔴 အဓိက ပြင်ဆင်ချက် - id အစား file_id ကို သုံးထားသည်
-        const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`; 
-
-        modal.style.display = 'flex';
-
-        if (player) {
-            player.destroy(); 
-            player = null;
-        }
-
-        video.src = streamUrl;
-        
-        // Plyr ကို အသုံးပြုပြီး Player ဖွင့်မယ်
+    // ၁။ ဗီဒီယို ဖွင့်ခြင်း (Player အသစ် ထပ်မဆောက်တော့ဘဲ ရှိပြီးသားကို ပြင်မယ်)
+function playVideo(fileId) {
+    const modal = document.getElementById('playerModal');
+    const video = document.getElementById('mainPlayer');
+    
+    // Link ကို ပြင်ဆင်မယ်
+    const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`;
+    
+    modal.style.display = 'flex';
+    
+    // 🔴 အရေးကြီးဆုံးအချက် - Player မရှိသေးမှ ဆောက်မယ်
+    if (!player) {
         player = new Plyr(video, {
-            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+            controls: ['play-large','restart', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
         });
-        
-        player.play().catch(e => console.log("Autoplay blocked", e));
     }
+    
+    // ပြီးရင် ရှိပြီးသား Player ထဲကို Link အသစ် ထည့်မယ်
+    video.src = streamUrl;
+    
+    // ဗီဒီယိုကို အလိုအလျောက် ဖွင့်ခိုင်းမယ်
+    player.play().catch(e => console.log("Autoplay blocked", e));
+}
 
-    // Player ပိတ်ခြင်း
-    function closePlayer() {
-        const modal = document.getElementById('playerModal');
-        modal.style.display = 'none';
-        if (player) { 
-            player.pause(); 
-        }
+// ၂။ ဗီဒီယို ပိတ်ခြင်း (Player ကို မဖျက်ဘဲ ခေတ္တရပ်ထားမယ်)
+function closePlayer() {
+    const modal = document.getElementById('playerModal');
+    modal.style.display = 'none';
+    
+    if (player) {
+        player.pause(); // ခေတ္တ ရပ်ခိုင်းမယ်။ ဖျက်မှာ မဟုတ်ပါဘူး။
     }
+}
 
     // စာမျက်နှာ စတင်တာနဲ့ အလုပ်လုပ်မယ်
     loadVideos();
