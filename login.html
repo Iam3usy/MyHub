@@ -29,19 +29,26 @@
             margin-top: 15px; 
             font-weight: bold;
         }
-        /* Back to Home Link */
         .back-home {
             display: block;
             text-align: center;
             margin-top: 20px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-muted);
             text-decoration: none;
             font-size: 14px;
-            transition: 0.2s;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
-        .back-home:hover {
+        .back-home:hover, .back-home:active {
+            background: rgba(255, 255, 255, 0.1);
             color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: scale(0.98);
         }
+
     </style>
 </head>
 <body>
@@ -50,10 +57,11 @@
         <div class="form-box">
             <h2 style="text-align: center; color: var(--primary); margin-bottom: 20px;">Login</h2>
             
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="key_code" placeholder="VIP Key">
+            <!-- Enter နှိပ်ရင်လည်း Login ဝင်အောင် onkeypress ထည့်ထားတယ် -->
+            <input type="text" id="username" placeholder="Username" onkeypress="handleEnter(event)">
+            <input type="password" id="key_code" placeholder="VIP Key" onkeypress="handleEnter(event)">
             
-            <button onclick="login()" id="loginBtn">ဝင်ရောက်မည်</button>
+            <button onclick="login()" id="loginBtn">Login</button>
             
             <p id="errorMsg" class="error"></p>
 
@@ -64,6 +72,13 @@
 
     <script>
         const API_URL = "https://myhubapp.dathalay1.workers.dev"; // မင်း Worker Link
+
+        // Enter နှိပ်ရင် Login ဝင်အောင် လုပ်မယ့် Function
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        }
 
         // Device ID ထုတ်ယူခြင်း (Browser တစ်ခုကို တစ်ခုတည်းသတ်မှတ်ဖို့)
         function getDeviceId() {
@@ -83,12 +98,12 @@
             const errorMsg = document.getElementById('errorMsg');
 
             if(!username || !key_code) {
-                errorMsg.innerText = "အချက်အလက်များ ပြည့်စုံအောင် ဖြည့်ပါ";
+                errorMsg.innerText = "Please fill in all fields";
                 return;
             }
 
             // ခလုတ်ကို Loading ပြမယ်
-            btn.innerText = "စစ်ဆေးနေပါသည်...";
+            btn.innerText = "Checking...";
             btn.disabled = true;
             btn.style.opacity = "0.7";
             errorMsg.innerText = "";
@@ -106,17 +121,17 @@
                     // အောင်မြင်ရင် Browser မှာ သိမ်းမယ်
                     localStorage.setItem('username', data.user.username);
                     localStorage.setItem('expired_date', data.user.expired_date);
-                    window.location.href = 'account.html'; // Account Page ကို ပို့မယ်
+                    window.location.href = 'account.html'; // Account Page
                 } else {
                     errorMsg.innerText = data.error;
                     // မအောင်မြင်ရင် ခလုတ်ကို ပုံမှန်ပြန်ထားမယ်
-                    btn.innerText = "ဝင်ရောက်မည်";
+                    btn.innerText = "Login";
                     btn.disabled = false;
                     btn.style.opacity = "1";
                 }
             } catch (error) {
-                errorMsg.innerText = "ဆာဗာ Error ဖြစ်နေပါတယ်";
-                btn.innerText = "ဝင်ရောက်မည်";
+                errorMsg.innerText = "Server error. Please try again.";
+                btn.innerText = "Login";
                 btn.disabled = false;
                 btn.style.opacity = "1";
             }
