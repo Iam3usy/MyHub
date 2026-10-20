@@ -136,7 +136,7 @@
     function playVideo(fileId) {
         const modal = document.getElementById('playerModal');
         const video = document.getElementById('mainPlayer');
-        const streamUrl = `${API_URL}/stream?id=${fileId}`; 
+        const streamUrl = `${API_URL}/stream?id=${encodeURIComponent(fileId)}`; 
 
         modal.style.display = 'flex';
 
