@@ -65,17 +65,26 @@
 </head>
 <body>
 
+    
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <div style="padding: 0 20px 20px; font-size: 24px; font-weight: bold; color: #fff;">Menu</div>
-        <a href="index.html"><span class="icon">🏠</span> Home</a>
-        <a href="categories.html"><span class="icon">🎬</span> Categories</a>
-        <a href="models.html"><span class="icon">👤</span> Models</a>
-        <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
-        <hr style="border-color: #333; margin: 10px 0;">
+        <div class="sidebar-header">
+            <div class="profile-img">👤</div>
+            <h2>MyVideo</h2>
+            <p>Premium Streaming</p>
+        </div>
         
-        <a href="login.html" id="navLogin" style="display: none;"><span class="icon">🔑</span> Login</a>
-        <a href="account.html" id="navAccount" class="active" style="color: #00ff88;"><span class="icon">👤</span> My Account</a>
+        <div class="sidebar-links">
+            <a href="index.html"><span class="icon">🏠</span> Home </a>
+            <a href="models.html"><span class="icon">👤</span> Models</a>
+            <a href="categories.html"><span class="icon">🎬</span> Categories</a>
+            <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
+            
+            <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+            
+            <a href="login.html" id="navLogin" style="color: #00d2ff;"><span class="icon">🔑</span> Login</a>
+            <a href="account.html" id="navAccount" class="active" style="display: none; color: #00ff88;"><span class="icon">⚙️</span> My Account</a>
+        </div>
     </div>
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
@@ -96,7 +105,7 @@
         </div>
 
         <div class="renew-box">
-            <h3>Renew Key (သက်တမ်းတိုးရန်)</h3>
+            <h3>Renew Key</h3>
             <p>အောက်ပါ Button များမှတဆင့် ဆက်သွယ်ပြီး Key သက်တမ်းတိုးနိုင်ပါသည်။</p>
             <div class="btn-group">
                 <!-- မင်းရဲ့ ဖုန်းနံပါတ်နဲ့ Telegram Link ကို ဒီမှာ ထည့်ပါ -->
@@ -105,7 +114,7 @@
             </div>
         </div>
 
-        <button class="logout-btn" onclick="logout()">Logout ထွက်မည်</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
     <script>
@@ -130,7 +139,7 @@
             const username = localStorage.getItem('username');
             const btn = document.querySelector('.logout-btn');
             
-            btn.innerText = "ထွက်နေပါသည်...";
+            btn.innerText = "Please Wait...";
             btn.disabled = true;
 
             // Database ထဲက Device ID ကို ဖျက်မယ်
