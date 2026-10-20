@@ -130,7 +130,7 @@ a { text-decoration: none; color: inherit; }
 .card:hover, .card:active { transform: translateY(-3px) scale(0.98); border-color: rgba(255, 0, 80, 0.4); box-shadow: 0 8px 20px var(--primary-glow); }
 .card video, .card img { 
     width: 100%; 
-    aspect-ratio: 16 / 9; 
+    aspect-ratio: 3 / 4; 
     object-fit: cover; 
     background: #000; 
     pointer-events: none; 
