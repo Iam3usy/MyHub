@@ -183,10 +183,3 @@ a { text-decoration: none; color: inherit; }
     color: #000; font-weight: bold;
     box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
 }
--bezier(0.175, 0.885, 0.32, 1.275);
-}
-#vipPopup .popup-btn {
-    background: linear-gradient(135deg, #ffd700, #ffaa00); /* VIP မို့ ရွှေရောင် */
-    color: #000; font-weight: bold;
-    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-}
