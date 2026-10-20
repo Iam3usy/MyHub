@@ -11,21 +11,27 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div style="padding: 0 20px 20px; font-size: 24px; font-weight: bold; color: #fff;">Menu</div>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="profile-img">👤</div>
+        <h2>MyVideo</h2>
+        <p>Premium Streaming</p>
+    </div>
+    
+    <div class="sidebar-links">
         <a href="index.html" class="active"><span class="icon">🏠</span> Home</a>
         <a href="categories.html"><span class="icon">🎬</span> Categories</a>
         <a href="models.html"><span class="icon">👤</span> Models</a>
         <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
-        <hr style="border-color: #333; margin: 10px 0;">
         
-        <!-- Login ဝင်ထားလား မဝင်ထားဘူး စစ်ပြီး ပြမယ် -->
+        <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+        
         <a href="login.html" id="navLogin" style="color: #00d2ff;"><span class="icon">🔑</span> Login</a>
-        <a href="account.html" id="navAccount" style="display: none; color: #00ff88;"><span class="icon">👤</span> My Account</a>
+        <a href="account.html" id="navAccount" style="display: none; color: #00ff88;"><span class="icon">⚙️</span> My Account</a>
     </div>
-    
-    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+</div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <!-- Navbar -->
     <div class="navbar">
