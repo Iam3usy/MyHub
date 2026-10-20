@@ -41,23 +41,22 @@
 
     <!-- Content -->
     <div class="container">
-        <h2 class="section-title">Latest Videos</h2>
         <div class="grid" id="videoGrid">
             <!-- Loading Spinner Center -->
-            <div class="loading-wrapper" style="grid-column: span 2;">
+            <div class="loading-wrapper" style="grid-column: span 3;">
                 <div class="spinner"></div>
-                <p>ခဏစောင့်ပါ...</p>
+                <p>Please Wait...</p>
             </div>
         </div>
     </div>
-
+    
     <!-- Custom Error Popup -->
     <div id="customPopup">
         <div class="popup-content">
             <div class="popup-icon">⚠️</div>
-            <div class="popup-title">Error တက်နေပါတယ်</div>
-            <div class="popup-message" id="popupMsg">ဒေတာ ဆွဲထုတ်မရပါဘူး။</div>
-            <button class="popup-btn" onclick="retryLoad()">ပြန်ကြိုးစားမည် (Retry)</button>
+            <div class="popup-title">Error</div>
+            <div class="popup-message" id="popupMsg">Cannot connect to the server</div>
+            <button class="popup-btn" onclick="retryLoad()">Retry</button>
         </div>
     </div>
 
@@ -94,9 +93,9 @@
             document.getElementById('customPopup').style.display = 'none';
             // Loading လေးပြန်ပြပြီး ဒေတာပြန်ဆွဲမယ်
             document.getElementById('videoGrid').innerHTML = `
-                <div class="loading-wrapper" style="grid-column: span 2;">
+                <div class="loading-wrapper" style="grid-column: span 3;">
                     <div class="spinner"></div>
-                    <p>ခဏစောင့်ပါ...</p>
+                    <p>Please Wait...</p>
                 </div>`;
             loadVideos();
         }
@@ -113,7 +112,7 @@
                 grid.innerHTML = ''; // Loading ကို ဖျက်မယ်
 
                 if(videos.length === 0) {
-                    grid.innerHTML = '<p style="text-align:center; grid-column: span 2; color:#888;">ဇာတ်ကား မရှိသေးပါ။</p>';
+                    grid.innerHTML = '<p style="text-align:center; grid-column: span 3; color:#888;">ဇာတ်ကား မရှိသေးပါ။</p>';
                     return;
                 }
 
