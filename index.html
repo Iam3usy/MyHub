@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Home - Premium Videos</title>
     
-    <!-- Google Font နဲ့ CSS ချိတ်ဆက်ခြင်း -->
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Plyr Video Player CSS -->
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 </head>
 <body>
 
@@ -35,46 +34,48 @@
 </div>
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-    <!-- Navbar -->
-    <div class="navbar">
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <h1 class="logo">My<span>Video</span></h1>
-    </div>
+<!-- Navbar -->
+<div class="navbar">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <h1 class="logo">My<span>Video</span></h1>
+</div>
 
-    <!-- Content -->
-    <div class="container">
-        <div class="grid video-grid" id="videoGrid">
-            <!-- Loading Spinner Center -->
-            <div class="loading-wrapper" style="grid-column: span 3;">
-                <div class="spinner"></div>
-                <p>Please Wait...</p>
-            </div>
+<!-- Content -->
+<div class="container">
+    <div class="grid video-grid" id="videoGrid">
+        <div class="loading-wrapper" style="grid-column: span 3;">
+            <div class="spinner"></div>
+            <p>Please Wait...</p>
         </div>
     </div>
-    
-    <!-- Custom Error Popup -->
-    <div id="customPopup">
-        <div class="popup-content">
-            <div class="popup-icon">⚠️</div>
-            <div class="popup-title">Error</div>
-            <div class="popup-message" id="popupMsg">Cannot connect to the server</div>
-            <button class="popup-btn" onclick="retryLoad()">Retry</button>
-        </div>
-    </div>
+</div>
 
-    <!-- Player Modal -->
-    <div id="playerModal">
-        <button id="closeBtn" onclick="closePlayer()">✕</button>
-        <video id="mainPlayer" controls playsinline></video>
+<!-- Custom Error Popup -->
+<div id="customPopup">
+    <div class="popup-content">
+        <div class="popup-icon">⚠️</div>
+        <div class="popup-title">Error</div>
+        <div class="popup-message" id="popupMsg">Cannot connect to the server</div>
+        <button class="popup-btn" onclick="retryLoad()">Retry</button>
     </div>
+</div>
 
-    <!-- Plyr Video Player JS -->
-     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-     <script>
+<!-- Player Modal -->
+<div id="playerModal">
+    <button id="closeBtn" onclick="closePlayer()">✕</button>
+    <video id="mainPlayer" controls playsinline></video>
+</div>
+
+<!-- Plyr JS & Hls.js ကို ချိတ်ဆက်ခြင်း -->
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<script>
     const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
-    let player; // Plyr အတွက် သတ်မှတ်မယ်
+    let player; 
+    let currentHls = null; // Hls ကို သိမ်းထားဖို့
 
-    // Sidebar မှာ Login/Account ပြဖို့ စစ်ဆေးခြင်း
+    // Sidebar စစ်ဆေးခြင်း
     if (localStorage.getItem('username')) {
         document.getElementById('navLogin').style.display = 'none';
         document.getElementById('navAccount').style.display = 'flex'; 
@@ -100,6 +101,7 @@
         loadVideos();
     }
 
+    // ဗီဒီယိုစာရင်း ဆွဲထုတ်ခြင်း
     async function loadVideos() {
         const grid = document.getElementById('videoGrid');
         try {
@@ -130,50 +132,54 @@
         }
     }
 
+    // ဗီဒီယို ဖွင့်ခြင်း (HLS နဲ့ Plyr ကို တွဲသုံးထားသည်)
     function playVideo(fileId) {
         const modal = document.getElementById('playerModal');
         const video = document.getElementById('mainPlayer');
-        const streamUrl = `${API_URL}/stream?file_id=${fileId}`;
-        
+        const streamUrl = `${API_URL}/stream?id=${fileId}`; 
+
         modal.style.display = 'flex';
 
-        // အရင် Player ရှိရင် ဖျက်မယ်
-        if (player) {
-            player.destroy();
-        }
+        // အရင်က Player နဲ့ Hls ရှိရင် အရင်ရှင်းမယ်
+        if (player) { player.destroy(); player = null; }
+        if (currentHls) { currentHls.destroy(); currentHls = null; }
 
-        // Plyr ကို အသုံးပြုပြီး Player ဖန်တီးမယ်
-        player = new Plyr(video, {
-            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-            settings: ['quality', 'speed'],
-            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
-        });
-
-        // Hls.js နဲ့ တွဲသုံးမယ်
         if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(streamUrl);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() { 
-                player.play(); 
+            currentHls = new Hls();
+            currentHls.loadSource(streamUrl);
+            currentHls.attachMedia(video);
+            
+            // m3u8 ဖတ်ပြီးမှ Player ကို ဆောက်မယ်
+            currentHls.on(Hls.Events.MANIFEST_PARSED, function() {
+                player = new Plyr(video, {
+                    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+                });
+                player.play().catch(e => console.log("Autoplay blocked", e));
             });
-            window.currentHls = hls;
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+
+            // Error ရှိရင် Console မှာ ပြမယ်
+            currentHls.on(Hls.Events.ERROR, function (event, data) {
+                console.error("HLS Error:", data);
+            });
+
+        } 
+        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
             video.src = streamUrl;
-            video.addEventListener('loadedmetadata', function() { player.play(); });
+            player = new Plyr(video);
+            player.play();
         }
     }
 
+    // Player ပိတ်ခြင်း
     function closePlayer() {
         const modal = document.getElementById('playerModal');
-        const video = document.getElementById('mainPlayer');
         modal.style.display = 'none';
-        video.pause();
-        video.src = '';
-        if(window.currentHls) window.currentHls.destroy();
-        if (player) { player.destroy(); player = null; }
+        if (player) { 
+            player.pause(); 
+        }
     }
 
+    // စာမျက်နှာ စတင်တာနဲ့ အလုပ်လုပ်မယ်
     loadVideos();
 </script>
 </body>
