@@ -145,7 +145,21 @@ a { text-decoration: none; color: inherit; }
     pointer-events: none; 
     border-bottom: 1px solid var(--border-color);
 }
-.card p, .card .title { padding: 8px 4px; font-size: 13px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.card p, .card .title { 
+    padding: 8px 4px; 
+    font-size: 13px; 
+    font-weight: 700; 
+    color: var(--text-main); 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    text-align: center; 
+    flex-shrink: 0; 
+    height: 40px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* --- Loading Spinner Center --- */
 .loading-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50vh; color: var(--primary); font-weight: bold; }
