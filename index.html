@@ -134,23 +134,20 @@
 function playVideo(fileId) {
     const modal = document.getElementById('playerModal');
     const video = document.getElementById('mainPlayer');
-    
-    // Link ကို ပြင်ဆင်မယ်
     const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`;
-    
+
     modal.style.display = 'flex';
-    
-    // 🔴 အရေးကြီးဆုံးအချက် - Player မရှိသေးမှ ဆောက်မယ်
+
     if (!player) {
         player = new Plyr(video, {
-            controls: ['play-large','restart', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+            controls: ['play-large','restart', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+            // 🔴 ဖုန်း Screen မှာ ခလုတ်တွေ အတင်းပေါ်စေရန် ဒီ (၂) ကြောင်း ထည့်ပါ
+            settings: ['captions', 'quality', 'speed', 'loop'],
+            fullscreen: { enabled: true, fallback: true, iosNative: true }
         });
     }
-    
-    // ပြီးရင် ရှိပြီးသား Player ထဲကို Link အသစ် ထည့်မယ်
+
     video.src = streamUrl;
-    
-    // ဗီဒီယိုကို အလိုအလျောက် ဖွင့်ခိုင်းမယ်
     player.play().catch(e => console.log("Autoplay blocked", e));
 }
 
