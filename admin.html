@@ -15,7 +15,6 @@
         .admin-header h1 { color: #ff0050; font-size: 24px; }
         .btn-logout { background: #ff3333; color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Padauk'; }
         
-        /* Tabs */
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         .tabs::-webkit-scrollbar { display: none; }
         .tab-btn { padding: 10px 20px; background: #19191e; border: 1px solid #333; color: #aaa; border-radius: 10px; cursor: pointer; white-space: nowrap; font-weight: bold; font-family: 'Padauk'; transition: 0.3s; }
@@ -24,7 +23,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        /* Form Box */
         .admin-form { background: rgba(25, 25, 30, 0.7); padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
         .admin-form h3 { margin-bottom: 15px; color: #fff; font-size: 18px; }
         .admin-form input, .admin-form select { width: 100%; padding: 12px; margin-bottom: 12px; background: rgba(0,0,0,0.5); border: 1px solid #333; color: white; border-radius: 8px; font-family: 'Padauk'; }
@@ -35,7 +33,6 @@
         .btn-save { width: 100%; padding: 12px; background: linear-gradient(135deg, #ff0050, #ff4d80); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Padauk'; font-size: 16px; }
         .btn-cancel { width: 100%; padding: 12px; background: #444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-family: 'Padauk'; display: none; }
         
-        /* List Items */
         .admin-list { display: flex; flex-direction: column; gap: 10px; }
         .admin-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #19191e; border: 1px solid #333; border-radius: 10px; }
         .admin-item-info { flex: 1; overflow: hidden; }
@@ -45,7 +42,6 @@
         .btn-edit { background: #00d2ff; color: #000; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 12px; }
         .btn-delete { background: #ff3333; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 12px; }
         
-        /* Loading */
         .loading { text-align: center; color: #ff0050; padding: 20px; font-weight: bold; }
     </style>
 </head>
@@ -57,7 +53,6 @@
             <button class="btn-logout" onclick="adminLogout()">Logout</button>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="openTab('videoTab', event)">Videos</button>
             <button class="tab-btn" onclick="openTab('modelTab', event)">Models</button>
@@ -80,9 +75,7 @@
                 <label style="margin-bottom: 5px; font-size: 13px; color: #aaa;">Model:</label>
                 <select id="vModel"><option value="">Loading...</option></select>
                 
-                <label>
-                    <input type="checkbox" id="vIsVip"> VIP Video?
-                </label>
+                <label><input type="checkbox" id="vIsVip"> VIP Video?</label>
 
                 <button class="btn-save" onclick="saveVideo()" id="vBtnSave">Save Video</button>
                 <button class="btn-cancel" onclick="resetVideoForm()" id="vBtnCancel">Cancel Edit</button>
@@ -119,12 +112,15 @@
         <!-- 🔴 4. USER TAB -->
         <div id="userTab" class="tab-content">
             <div class="admin-form">
-                <h3 style="margin-bottom: 15px;">Add New User (VIP Key)</h3>
+                <h3 id="userFormTitle">Add New User</h3>
+                <input type="hidden" id="uId">
                 <input type="text" id="uName" placeholder="Username">
                 <input type="text" id="uKey" placeholder="Key Code (e.g. VIP-1234)">
                 <input type="date" id="uExpired" style="color: white;">
-                <button class="btn-save" onclick="saveUser()">Create User</button>
+                <button class="btn-save" onclick="saveUser()" id="uBtnSave">Create User</button>
+                <button class="btn-cancel" onclick="resetUserForm()" id="uBtnCancel">Cancel Edit</button>
             </div>
+            <div class="admin-list" id="userList"><div class="loading">Loading users...</div></div>
         </div>
     </div>
 
@@ -133,8 +129,8 @@
         let allModels = [];
         let allCategories = [];
         let allVideos = [];
+        let allUsers = [];
 
-        // 🔴 Admin Login မဝင်ထားရင် Login Page ကို ပြန်ပို့မယ်
         if(localStorage.getItem('admin_logged_in') !== 'true') {
             window.location.href = 'admin-login.html';
         }
@@ -153,6 +149,7 @@
             if(tabName === 'videoTab') loadVideoData();
             if(tabName === 'modelTab') loadModelData();
             if(tabName === 'categoryTab') loadCategoryData();
+            if(tabName === 'userTab') loadUserData(); // 🔴 User Tab အတွက် ထည့်ထားတယ်
         }
 
         // ==========================================
@@ -161,7 +158,6 @@
         async function loadVideoData() {
             try {
                 const res = await fetch(`${API_URL}/api/videos`);
-                if(!res.ok) throw new Error("API Error");
                 allVideos = await res.json();
                 
                 const mRes = await fetch(`${API_URL}/api/models`);
@@ -187,7 +183,7 @@
                         </div>
                     </div>
                 `).join('');
-            } catch(e) { document.getElementById('videoList').innerHTML = '<div class="loading" style="color:red;">Error loading data. Check API.</div>'; }
+            } catch(e) { document.getElementById('videoList').innerHTML = '<div class="loading" style="color:red;">Error loading data.</div>'; }
         }
 
         function editVideo(id) {
@@ -221,7 +217,7 @@
             const catId = document.getElementById('vCategory').value;
             const isVip = document.getElementById('vIsVip').checked ? 1 : 0;
 
-            if(!title || !fileId) return alert("Title နဲ့ File ID ဖြည့်ပါ");
+            if(!title || !fileId) return alert("Title & File ID ဖြည့်ပါ");
 
             const payload = {
                 title: title, preview_url: preview, file_id: fileId, 
@@ -235,7 +231,7 @@
                     method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
                 });
                 if(res.ok) { alert("Saved!"); resetVideoForm(); loadVideoData(); }
-                else alert("Error: API returned an error.");
+                else alert("Error");
             } catch(e) { alert("Network Error"); }
         }
 
@@ -351,7 +347,7 @@
                 if(res.ok) { alert("Saved!"); resetCategoryForm(); loadCategoryData(); }
             } catch(e) { alert("Error"); }
         }
-                async function deleteCategory(id) {
+        async function deleteCategory(id) {
             if(!confirm("ဖျက်မှာသေချာလား?")) return;
             try {
                 const res = await fetch(`${API_URL}/api/admin/delete-category`, {
@@ -362,18 +358,78 @@
         }
 
         // ==========================================
-        // 4. USER FUNCTIONS
+        // 4. USER FUNCTIONS (အသစ်)
         // ==========================================
+        async function loadUserData() {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/users`);
+                allUsers = await res.json();
+                const list = document.getElementById('userList');
+                if(allUsers.length === 0) { list.innerHTML = '<div class="loading">No users found.</div>'; return; }
+                list.innerHTML = allUsers.map(u => `
+                    <div class="admin-item">
+                        <div class="admin-item-info">
+                            <h4>${u.username}</h4>
+                            <p>Key: ${u.key_code} | Expired: ${u.expired_date}</p>
+                        </div>
+                        <div class="admin-actions">
+                            <button class="btn-edit" onclick="editUser(${u.id})">Edit</button>
+                            <button class="btn-delete" onclick="deleteUser(${u.id})">Del</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch(e) { document.getElementById('userList').innerHTML = '<div class="loading" style="color:red;">Error loading users.</div>'; }
+        }
+
+        function editUser(id) {
+            const u = allUsers.find(x => x.id === id);
+            document.getElementById('uId').value = u.id;
+            document.getElementById('uName').value = u.username;
+            document.getElementById('uKey').value = u.key_code;
+            document.getElementById('uExpired').value = u.expired_date;
+            document.getElementById('userFormTitle').innerText = "Edit User";
+            document.getElementById('uBtnSave').innerText = "Update User";
+            document.getElementById('uBtnCancel').style.display = 'block';
+            window.scrollTo(0,0);
+        }
+
+        function resetUserForm() {
+            document.getElementById('uId').value = '';
+            document.getElementById('uName').value = '';
+            document.getElementById('uKey').value = '';
+            document.getElementById('uExpired').value = '';
+            document.getElementById('userFormTitle').innerText = "Add New User";
+            document.getElementById('uBtnSave').innerText = "Create User";
+            document.getElementById('uBtnCancel').style.display = 'none';
+        }
+
         async function saveUser() {
+            const id = document.getElementById('uId').value;
             const username = document.getElementById('uName').value;
             const key_code = document.getElementById('uKey').value;
             const expired_date = document.getElementById('uExpired').value;
+
             if(!username || !key_code || !expired_date) return alert("အကုန်ဖြည့်ပါ");
+
+            const endpoint = id ? '/api/admin/edit-user' : '/api/admin/add-user';
+            const payload = id ? { id, username, key_code, expired_date } : { username, key_code, expired_date };
+
             try {
-                const res = await fetch(`${API_URL}/api/admin/add-user`, {
-                    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ username, key_code, expired_date })
+                const res = await fetch(`${API_URL}${endpoint}`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
                 });
-                if(res.ok) { alert("User Created!"); document.getElementById('uName').value=''; document.getElementById('uKey').value=''; }
+                if(res.ok) { alert(id ? "Updated!" : "User Created!"); resetUserForm(); loadUserData(); }
+                else { alert("Error: ဒီ Username ရှိပြီးသား ဖြစ်နိုင်ပါတယ်"); }
+            } catch(e) { alert("Error"); }
+        }
+
+        async function deleteUser(id) {
+            if(!confirm("ဒီ User ကို ဖျက်မှာသေချာလား?")) return;
+            try {
+                const res = await fetch(`${API_URL}/api/admin/delete-user`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ id })
+                });
+                if(res.ok) { alert("Deleted!"); loadUserData(); }
             } catch(e) { alert("Error"); }
         }
 
