@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Popular - Premium Videos</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <!-- Profile ID -->
+        <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
+        <h2>MyVideo</h2>
+        <p>Premium Streaming</p>
+    </div>
+    
+    <div class="sidebar-links">
+        <a href="index.html"><span class="icon">🏠</span> Home</a>
+        <a href="categories.html"><span class="icon">🎬</span> Categories</a>
+        <a href="models.html"><span class="icon">👤</span> Models</a>
+        <a href="popular.html" class="active" style="color: #00ff88;"><span class="icon">🔥</span> Popular</a>
+        <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
+        
+        <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+        
+        <a href="login.html" id="navLogin" style="color: #00d2ff;"><span class="icon">🔑</span> Login</a>
+        <a href="account.html" id="navAccount" style="display: none; color: #00ff88;"><span class="icon">⚙️</span> My Account</a>
+    </div>
+</div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<!-- Navbar -->
+<div class="navbar">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <h1 class="logo">🔥 Popular <span>Videos</span></h1>
+</div>
+
+<!-- Content -->
+<div class="container">
+    <div class="grid video-grid" id="videoGrid">
+        <div class="loading-wrapper" style="grid-column: span 3;">
+            <div class="spinner"></div>
+            <p>Please Wait . . .</p>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Error Popup -->
+<div id="customPopup">
+    <div class="popup-content">
+        <div class="popup-icon">⚠️</div>
+        <div class="popup-title">Error</div>
+        <div class="popup-message" id="popupMsg">Cannot connect to the server</div>
+        <button class="popup-btn" onclick="retryLoad()">Retry</button>
+    </div>
+</div>
+
+<!-- Player Modal -->
+<div id="playerModal">
+    <button id="closeBtn" onclick="closePlayer()">✕</button>
+    <video id="mainPlayer" controls playsinline></video>
+</div>
+
+<!-- Plyr JS -->
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
+<script>
+    const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
+    let player; 
+
+    // Sidebar Check
+    if (localStorage.getItem('username')) {
+        document.getElementById('navLogin').style.display = 'none';
+        document.getElementById('navAccount').style.display = 'flex'; 
+        
+        const savedPic = localStorage.getItem('profile_pic');
+        if (savedPic) {
+            document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    }
+
+    function toggleMenu() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('show');
+    }
+
+    function showErrorPopup(message) {
+        document.getElementById('popupMsg').innerText = message;
+        document.getElementById('customPopup').style.display = 'flex';
+    }
+
+    function retryLoad() {
+        document.getElementById('customPopup').style.display = 'none';
+        document.getElementById('videoGrid').innerHTML = `
+            <div class="loading-wrapper" style="grid-column: span 2;">
+                <div class="spinner"></div>
+                <p>Please Wait . . .</p>
+            </div>`;
+        loadPopularVideos();
+    }
+
+    // 🔴 Popular Videos List
+    async function loadPopularVideos() {
+        const grid = document.getElementById('videoGrid');
+        try {
+            const res = await fetch(`${API_URL}/api/videos/popular`);
+            if (!res.ok) throw new Error("Server Error");
+
+            const videos = await res.json();
+            grid.innerHTML = ''; 
+
+            if(videos.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; grid-column: span 2; color:#888; margin-top: 20px;">No Videos for this Content</p>';
+                return;
+            }
+
+            videos.forEach((video, index) => {
+                const card = document.createElement('div');
+                card.className = 'card video-card';
+                // 🔴 ideos count
+                card.onclick = () => playVideo(video.file_id, video.id);
+                
+                // 🔴 Views  
+                let viewCount = video.views || 0;
+                if (viewCount >= 1000000) {
+                    viewCount = (viewCount / 1000000).toFixed(1) + 'M';
+                } else if (viewCount >= 1000) {
+                    viewCount = (viewCount / 1000).toFixed(1) + 'K';
+                }
+
+                let rankBadge = '';
+                if (index === 0) rankBadge = '<span style="color: gold; font-size: 16px; margin-right: 5px;">🥇</span>';
+                else if (index === 1) rankBadge = '<span style="color: silver; font-size: 16px; margin-right: 5px;">🥈</span>';
+                else if (index === 2) rankBadge = '<span style="color: #cd7f32; font-size: 16px; margin-right: 5px;">🥉</span>';
+
+                card.innerHTML = `
+                    <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
+                    <div class="title" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%;">${rankBadge}${video.title}</span>
+                        <span style="color: #00e676; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 2px;">
+                            👁 ${viewCount}
+                        </span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        } catch (error) {
+            grid.innerHTML = ''; 
+            showErrorPopup(error.message); 
+        }
+    }
+
+    // Load Videos 
+    function playVideo(fileId, videoId) {
+        const modal = document.getElementById('playerModal');
+        const video = document.getElementById('mainPlayer');
+        const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`;
+
+        modal.style.display = 'flex';
+
+        if (!player) {
+            player = new Plyr(video, {
+                controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                settings: ['captions', 'quality', 'speed', 'loop'],
+                fullscreen: { enabled: true, fallback: true, iosNative: true }
+            });
+        }
+
+        video.src = streamUrl;
+        player.play().catch(e => console.log("Autoplay blocked", e));
+
+        // Views 
+        fetch(`${API_URL}/api/videos/view`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: videoId })
+        }).catch(e => console.log("View count error", e));
+    }
+
+    // Closed Player
+    function closePlayer() {
+        const modal = document.getElementById('playerModal');
+        modal.style.display = 'none';
+        
+        if (player) {
+            player.pause(); 
+        }
+    }
+
+    loadPopularVideos();
+</script>
+</body>
+</html>
