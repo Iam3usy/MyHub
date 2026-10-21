@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Videos</title>
     
-    <!-- Google Font နဲ့ CSS ချိတ်ဆက်ခြင်း -->
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    
-    <!-- 🔴 Plyr Video Player CSS -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
     <style>
-        /* VIP Page အတွက် သီးသန့် အရောင် (ရွှေရောင်) */
+        /* VIP Page */
         .logo { color: gold !important; }
         .sidebar a.active-vip { color: gold !important; border-left-color: gold !important; }
     </style>
@@ -23,7 +20,8 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="profile-img">👤</div>
+            <!-- 🔴 Profile -->
+            <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
             <h2>MyVideo</h2>
             <p>Premium Streaming</p>
         </div>
@@ -32,6 +30,8 @@
             <a href="index.html"><span class="icon">🏠</span> Home </a>
             <a href="models.html"><span class="icon">👤</span> Models</a>
             <a href="categories.html"><span class="icon">🎬</span> Categories</a>
+            <!-- 🔴 Popular Link -->
+            <a href="popular.html" style="color: #00ff88;"><span class="icon">🔥</span> Popular</a>
             <a href="vip.html" class="active" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
             
             <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
@@ -50,12 +50,10 @@
 
     <!-- Content -->
     <div class="container">
-        <!-- 🔴 Video တွေ ၂ ခုစီစီဖို့ video-grid class ထည့်ထားတယ် -->
         <div class="grid video-grid" id="videoGrid">
-            <!-- Loading Spinner Center -->
             <div class="loading-wrapper" style="grid-column: span 2;">
                 <div class="spinner"></div>
-                <p>Please Wait...</p>
+                <p>Please Wait . . .</p>
             </div>
         </div>
     </div>
@@ -87,18 +85,22 @@
         <video id="mainPlayer" controls playsinline></video>
     </div>
 
-    <!-- 🔴 Plyr Video Player JS -->
+    <!-- Plyr JS -->
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <script>
         const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
-        let player; // Plyr Player အတွက်
+        let player; 
         
-        // Sidebar Login/Account စစ်ဆေး
+        // 🔴 Sidebar 
         if (localStorage.getItem('username')) {
             document.getElementById('navLogin').style.display = 'none';
             document.getElementById('navAccount').style.display = 'flex';
+            
+            const savedPic = localStorage.getItem('profile_pic');
+            if (savedPic) {
+                document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            }
         }
 
         function toggleMenu() {
@@ -116,7 +118,7 @@
             document.getElementById('videoGrid').innerHTML = `
                 <div class="loading-wrapper" style="grid-column: span 2;">
                     <div class="spinner"></div>
-                    <p>Checking...</p>
+                    <p>Checking . . .</p>
                 </div>`;
             loadVipVideos();
         }
@@ -152,8 +154,9 @@
 
                 videos.forEach(video => {
                     const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => playVideo(video.file_id);
+                    card.className = 'card video-card';
+            
+                    card.onclick = () => playVideo(video.file_id, video.id);
                     card.innerHTML = `
                         <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
                         <div class="title" style="color: gold;">${video.title} 👑</div>
@@ -166,42 +169,40 @@
             }
         }
 
-        // 🔴 Plyr နဲ့ ဗီဒီယိုဖွင့်ခြင်း
-        function playVideo(fileId) {
+        // 🔴 Play Videos 
+        function playVideo(fileId, videoId) {
             const modal = document.getElementById('playerModal');
             const video = document.getElementById('mainPlayer');
-            const streamUrl = `${API_URL}/stream?file_id=${fileId}`;
+            const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`;
             
             modal.style.display = 'flex';
 
-            if (player) player.destroy();
-
-            player = new Plyr(video, {
-                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-                settings: ['quality', 'speed'],
-                speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
-            });
-
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(streamUrl);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() { player.play(); });
-                window.currentHls = hls;
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = streamUrl;
-                video.addEventListener('loadedmetadata', function() { player.play(); });
+            if (!player) {
+                player = new Plyr(video, {
+                    controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+                });
             }
+
+            video.src = streamUrl;
+            player.play().catch(e => console.log("Autoplay blocked", e));
+
+            // 🔴 Views
+            fetch(`${API_URL}/api/videos/view`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: videoId })
+            }).catch(e => console.log("View count error", e));
         }
+        
+        // 
 
         function closePlayer() {
             const modal = document.getElementById('playerModal');
-            const video = document.getElementById('mainPlayer');
             modal.style.display = 'none';
-            video.pause(); 
-            video.src = ''; 
-            if(window.currentHls) window.currentHls.destroy();
-            if (player) { player.destroy(); player = null; }
+            
+            if (player) { 
+                player.pause(); 
+            }
         }
 
         loadVipVideos();
