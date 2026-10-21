@@ -47,7 +47,7 @@
     <div class="grid video-grid" id="videoGrid">
         <div class="loading-wrapper" style="grid-column: span 3;">
             <div class="spinner"></div>
-            <p>Please Wait...</p>
+            <p>Please Wait . . .</p>
         </div>
     </div>
 </div>
@@ -68,19 +68,20 @@
     <video id="mainPlayer" controls playsinline></video>
 </div>
 
-<!-- Plyr JS ကို ချိတ်ဆက်ခြင်း -->
+<!-- Plyr JS -->
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
 <script>
     const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
     let player; 
 
-    // 🔴 Sidebar စစ်ဆေးခြင်း (Profile ပုံပါ ပြမယ်)
+    // 🔴 Sidebar Check
+    
     if (localStorage.getItem('username')) {
         document.getElementById('navLogin').style.display = 'none';
         document.getElementById('navAccount').style.display = 'flex'; 
         
-        // Local Storage ထဲမှာ ပုံရှိရင် Sidebar မှာ ပြမယ်
+        // Save Pic
         const savedPic = localStorage.getItem('profile_pic');
         if (savedPic) {
             document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
@@ -102,12 +103,12 @@
         document.getElementById('videoGrid').innerHTML = `
             <div class="loading-wrapper" style="grid-column: span 2;">
                 <div class="spinner"></div>
-                <p>ခဏစောင့်ပါ...</p>
+                <p>Please Wait . . .</p>
             </div>`;
         loadVideos();
     }
 
-    // ဗီဒီယိုစာရင်း ဆွဲထုတ်ခြင်း
+    // Load Video 
     async function loadVideos() {
         const grid = document.getElementById('videoGrid');
         try {
@@ -118,7 +119,7 @@
             grid.innerHTML = ''; 
 
             if(videos.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column: span 2; color:#888; margin-top: 20px;">ဇာတ်ကား မရှိသေးပါ။</p>';
+                grid.innerHTML = '<p style="text-align:center; grid-column: span 2; color:#888; margin-top: 20px;">No Videos for this content</p>';
                 return;
             }
 
@@ -139,7 +140,7 @@
         }
     }
 
-    // ၁။ ဗီဒီယို ဖွင့်ခြင်း (videoId ကို ပါ လက်ခံမယ်)
+    // Play Video 
     function playVideo(fileId, videoId) {
         const modal = document.getElementById('playerModal');
         const video = document.getElementById('mainPlayer');
@@ -158,7 +159,7 @@
         video.src = streamUrl;
         player.play().catch(e => console.log("Autoplay blocked", e));
 
-        // 🔴 အသစ်ထည့်ရန် - Views တိုးစေမယ့် API ကို လှမ်းခေါ်မယ်
+        // Views 
         fetch(`${API_URL}/api/videos/view`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -166,7 +167,7 @@
         }).catch(e => console.log("View count error", e));
     }
 
-    // ၂။ ဗီဒီယို ပိတ်ခြင်း (Player ကို မဖျက်ဘဲ ခေတ္တရပ်ထားမယ်)
+    // close player 
     function closePlayer() {
         const modal = document.getElementById('playerModal');
         modal.style.display = 'none';
@@ -176,7 +177,6 @@
         }
     }
 
-    // စာမျက်နှာ စတင်တာနဲ့ အလုပ်လုပ်မယ်
     loadVideos();
 </script>
 </body>
