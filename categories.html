@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Categories</title>
     
-    <!-- Google Font နဲ့ CSS ချိတ်ဆက်ခြင်း -->
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -14,7 +14,8 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="profile-img">👤</div>
+            <!-- 🔴 Profile -->
+            <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
             <h2>MyVideo</h2>
             <p>Premium Streaming</p>
         </div>
@@ -23,6 +24,7 @@
             <a href="index.html"><span class="icon">🏠</span> Home </a>
             <a href="models.html"><span class="icon">👤</span> Models</a>
             <a href="categories.html" class="active"><span class="icon">🎬</span> Categories</a>
+            <a href="popular.html" style="color: #00ff88;"><span class="icon">🔥</span> Popular</a>
             <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
             
             <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
@@ -41,12 +43,12 @@
 
     <!-- Content -->
     <div class="container">
-        <!-- 🔴 ID ကို categoryGrid လို့ ပြင်ထားပါတယ် -->
+
         <div class="grid" id="categoryGrid">
             <!-- Loading Spinner Center -->
             <div class="loading-wrapper" style="grid-column: span 3;">
                 <div class="spinner"></div>
-                <p>Please Wait...</p>
+                <p>Please Wait . . .</p>
             </div>
         </div>
     </div>
@@ -62,38 +64,44 @@
     </div>
 
     <script>
-        const API_URL = "https://myhubapp.dathalay1.workers.dev"; // မင်း Worker Link
+        const API_URL = "https://myhubapp.dathalay1.workers.dev";
 
-        // Sidebar မှာ Login/Account ပြဖို့ စစ်ဆေးခြင်း
+        // 🔴 Sidebar
         if (localStorage.getItem('username')) {
             document.getElementById('navLogin').style.display = 'none';
             document.getElementById('navAccount').style.display = 'flex'; 
+            
+            // Save Pic
+            const savedPic = localStorage.getItem('profile_pic');
+            if (savedPic) {
+                document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            }
         }
 
-        // Sidebar အဖွင့်အပိတ်
+        // Sidebar 
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('overlay').classList.toggle('show');
         }
 
-        // Error Popup ပြမယ့် Function
+        // Error Popup 
         function showErrorPopup(message) {
             document.getElementById('popupMsg').innerText = message;
             document.getElementById('customPopup').style.display = 'flex';
         }
 
-        // Retry နှိပ်ရင် လုပ်မယ့်အလုပ်
+        // Retry
         function retryLoad() {
             document.getElementById('customPopup').style.display = 'none';
             document.getElementById('categoryGrid').innerHTML = `
                 <div class="loading-wrapper" style="grid-column: span 3;">
                     <div class="spinner"></div>
-                    <p>Please Wait...</p>
+                    <p>Please Wait . . .</p>
                 </div>`;
             loadCategories();
         }
 
-        // Category များ ဆွဲထုတ်ခြင်း
+        // Category
         async function loadCategories() {
             const grid = document.getElementById('categoryGrid');
             
@@ -102,20 +110,27 @@
                 if (!res.ok) throw new Error("Server Error");
 
                 const cats = await res.json();
-                grid.innerHTML = ''; // Loading ကို ဖျက်မယ်
+                grid.innerHTML = ''; 
 
                 if(cats.length === 0) {
-                    grid.innerHTML = '<p style="text-align:center; grid-column: span 3; color:#888;">Category မရှိသေးပါ။</p>';
+                    grid.innerHTML = '<p style="text-align:center; grid-column: span 3; color:#888;">No Category for this content</p>';
                     return;
                 }
 
                 cats.forEach(cat => {
                     const a = document.createElement('a');
-                    a.className = 'card';
+                    a.className = 'card model-card';
                     a.href = `category.html?id=${cat.id}&name=${encodeURIComponent(cat.name)}`;
+                    
                     a.innerHTML = `
                         <img src="${cat.image || 'https://via.placeholder.com/150'}" alt="${cat.name}">
-                        <p>${cat.name}</p>
+                        <p class="title" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 0;">
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${cat.name}</span>
+                            <span style="color: #00e676; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 2px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                ${cat.video_count || 0}
+                            </span>
+                        </p>
                     `;
                     grid.appendChild(a);
                 });
@@ -125,7 +140,6 @@
             }
         }
 
-        // စာမျက်နှာ စတင်တာနဲ့ အလုပ်လုပ်မယ်
         loadCategories();
     </script>
 </body>
