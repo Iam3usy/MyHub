@@ -1,28 +1,30 @@
-
 <!DOCTYPE html>
 <html lang="my">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Models</title>
+    <title>Model Videos</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 </head>
 <body>
-
+    
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
+            <!-- 🔴 Profile -->
             <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
             <h2>MyVideo</h2>
             <p>Premium Streaming</p>
         </div>
-
+        
         <div class="sidebar-links">
             <a href="index.html"><span class="icon">🏠</span> Home </a>
             <a href="models.html" class="active"><span class="icon">👤</span> Models</a>
             <a href="categories.html"><span class="icon">🎬</span> Categories</a>
+            <!-- 🔴 Popular Link -->
             <a href="popular.html" style="color: #00ff88;"><span class="icon">🔥</span> Popular</a>
             <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
             
@@ -37,13 +39,14 @@
     <!-- Navbar -->
     <div class="navbar">
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <h1 class="logo">Models</h1>
+        <a href="models.html" style="color: white; text-decoration: none; font-size: 24px; margin-right: 10px;">&#8592;</a>
+        <h1 class="logo" id="pageTitle">Videos</h1>
     </div>
 
     <!-- Content -->
     <div class="container">
-        <div class="grid" id="modelGrid">
-            <div class="loading-wrapper" style="grid-column: span 3;">
+        <div class="grid video-grid" id="videoGrid">
+            <div class="loading-wrapper" style="grid-column: span 2;">
                 <div class="spinner"></div>
                 <p>Please Wait . . .</p>
             </div>
@@ -60,10 +63,25 @@
         </div>
     </div>
 
+    <!-- Player Modal -->
+    <div id="playerModal">
+        <button id="closeBtn" onclick="closePlayer()">✕</button>
+        <video id="mainPlayer" controls playsinline></video>
+    </div>
+
+    <!-- Plyr JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    
     <script>
         const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
+        const urlParams = new URLSearchParams(window.location.search);
+        const modelId = urlParams.get('id');
+        const modelName = urlParams.get('name');
+        let player; 
 
-        // Sidebar Login/Account 
+        if(modelName) document.getElementById('pageTitle').innerText = modelName;
+
+        // 🔴 Sidebar
         if (localStorage.getItem('username')) {
             document.getElementById('navLogin').style.display = 'none';
             document.getElementById('navAccount').style.display = 'flex'; 
@@ -86,43 +104,43 @@
 
         function retryLoad() {
             document.getElementById('customPopup').style.display = 'none';
-            document.getElementById('modelGrid').innerHTML = `
-                <div class="loading-wrapper" style="grid-column: span 3;">
+            document.getElementById('videoGrid').innerHTML = `
+                <div class="loading-wrapper" style="grid-column: span 2;">
                     <div class="spinner"></div>
                     <p>Please Wait . . .</p>
                 </div>`;
-            loadModels();
+            loadVideos();
         }
 
-        async function loadModels() {
-            const grid = document.getElementById('modelGrid');
+        async function loadVideos() {
+            if(!modelId) {
+                document.getElementById('videoGrid').innerHTML = '<p style="grid-column: span 2; text-align:center;">Model ID Error</p>';
+                return;
+            }
+
+            const grid = document.getElementById('videoGrid');
             
             try {
-                const res = await fetch(`${API_URL}/api/models`);
+                const res = await fetch(`${API_URL}/api/videos/model?id=${modelId}`);
                 if (!res.ok) throw new Error("Server Error");
 
-                const models = await res.json();
+                const videos = await res.json();
                 grid.innerHTML = ''; 
 
-                if(models.length === 0) {
-                    grid.innerHTML = '<p style="text-align:center; grid-column: span 3; color:#888;">Unavailable for this Model</p>';
+                if(videos.length === 0) {
+                    grid.innerHTML = '<p style="grid-column: span 2; text-align:center; color:#888;">No Videos for this Model</p>';
                     return;
                 }
 
-                models.forEach(m => {
-                    const a = document.createElement('a');
-                    a.className = 'card model-card'; 
-                    a.href = `model.html?id=${m.id}&name=${encodeURIComponent(m.name)}`;
-                    
-                    // 🔴 ပုံကို div ထဲမှာ ထည့်ပြီး အောက်ထောင့်မှာ 🎥 badge လေး ထည့်ထားပါတယ်
-                    a.innerHTML = `
-                        <div style="position: relative; width: 100%; aspect-ratio: 3 / 4; overflow: hidden;">
-                            <img src="${m.image || 'https://via.placeholder.com/150'}" alt="${m.name}" style="width: 100%; height: 100%; object-fit: cover;">
-                            <span class="video-count-badge">🎥 ${m.video_count || 0}</span>
-                        </div>
-                        <p class="title" style="padding: 8px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; text-align: left;">${m.name}</p>
+                videos.forEach(video => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => playVideo(video.file_id, video.id);
+                    card.innerHTML = `
+                        <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
+                        <div class="title">${video.title}</div>
                     `;
-                    grid.appendChild(a);
+                    grid.appendChild(card);
                 });
             } catch (error) {
                 grid.innerHTML = ''; 
@@ -130,7 +148,40 @@
             }
         }
 
-        loadModels();
+        function playVideo(fileId, videoId) {
+            const modal = document.getElementById('playerModal');
+            const video = document.getElementById('mainPlayer');
+            const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`;
+            
+            modal.style.display = 'flex';
+
+            if (!player) {
+                player = new Plyr(video, {
+                    controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+                });
+            }
+
+            video.src = streamUrl;
+            player.play().catch(e => console.log("Autoplay blocked", e));
+
+            // Views 
+            fetch(`${API_URL}/api/videos/view`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: videoId })
+            }).catch(e => console.log("View count error", e));
+        }
+
+        function closePlayer() {
+            const modal = document.getElementById('playerModal');
+            modal.style.display = 'none';
+            
+            if (player) { 
+                player.pause(); 
+            }
+        }
+
+        loadVideos();
     </script>
 </body>
 </html>
