@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Models</title>
     
-    <!-- Google Font & CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -14,7 +13,6 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <!-- 🔴 Profile -->
             <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
             <h2>MyVideo</h2>
             <p>Premium Streaming</p>
@@ -24,7 +22,6 @@
             <a href="index.html"><span class="icon">🏠</span> Home </a>
             <a href="models.html" class="active"><span class="icon">👤</span> Models</a>
             <a href="categories.html"><span class="icon">🎬</span> Categories</a>
-            <!-- 🔴 Popular Link -->
             <a href="popular.html" style="color: #00ff88;"><span class="icon">🔥</span> Popular</a>
             <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
             
@@ -44,9 +41,7 @@
 
     <!-- Content -->
     <div class="container">
-        <!-- modelGrid -->
         <div class="grid" id="modelGrid">
-            <!-- Loading Spinner Center -->
             <div class="loading-wrapper" style="grid-column: span 3;">
                 <div class="spinner"></div>
                 <p>Please Wait . . .</p>
@@ -67,31 +62,27 @@
     <script>
         const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
 
-        // 🔴 Sidebar Login/Account 
+        // Sidebar Login/Account 
         if (localStorage.getItem('username')) {
             document.getElementById('navLogin').style.display = 'none';
             document.getElementById('navAccount').style.display = 'flex'; 
             
-            // Save Piv
             const savedPic = localStorage.getItem('profile_pic');
             if (savedPic) {
                 document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
             }
         }
 
-        // Sidebar
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('overlay').classList.toggle('show');
         }
 
-        // Error Popup
         function showErrorPopup(message) {
             document.getElementById('popupMsg').innerText = message;
             document.getElementById('customPopup').style.display = 'flex';
         }
 
-        // Retry
         function retryLoad() {
             document.getElementById('customPopup').style.display = 'none';
             document.getElementById('modelGrid').innerHTML = `
@@ -102,7 +93,6 @@
             loadModels();
         }
 
-        // Models Load
         async function loadModels() {
             const grid = document.getElementById('modelGrid');
             
@@ -123,15 +113,13 @@
                     a.className = 'card model-card'; 
                     a.href = `model.html?id=${m.id}&name=${encodeURIComponent(m.name)}`;
                     
+                    // 🔴 ပုံကို div ထဲမှာ ထည့်ပြီး အောက်ထောင့်မှာ 🎥 badge လေး ထည့်ထားပါတယ်
                     a.innerHTML = `
-                        <img src="${m.image || 'https://via.placeholder.com/150'}" alt="${m.name}">
-                        <p class="title" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 0;">
-                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.name}</span>
-                            <span style="color: #00e676; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 2px;">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                                ${m.video_count || 0}
-                            </span>
-                        </p>
+                        <div style="position: relative; width: 100%; aspect-ratio: 3 / 4; overflow: hidden;">
+                            <img src="${m.image || 'https://via.placeholder.com/150'}" alt="${m.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <span class="video-count-badge">🎥 ${m.video_count || 0}</span>
+                        </div>
+                        <p class="title" style="padding: 8px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; text-align: left;">${m.name}</p>
                     `;
                     grid.appendChild(a);
                 });
