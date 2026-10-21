@@ -15,7 +15,8 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="profile-img">👤</div>
+        <!-- 🔴 Sidebar Profile ပုံအတွက် ID ပေးထားတယ် -->
+        <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
         <h2>MyVideo</h2>
         <p>Premium Streaming</p>
     </div>
@@ -24,6 +25,7 @@
         <a href="index.html" class="active"><span class="icon">🏠</span> Home</a>
         <a href="categories.html"><span class="icon">🎬</span> Categories</a>
         <a href="models.html"><span class="icon">👤</span> Models</a>
+        <a href="popular.html" style="color: #00ff88;"><span class="icon">🔥</span> Popular</a>
         <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
         
         <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
@@ -73,10 +75,16 @@
     const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
     let player; 
 
-    // Sidebar စစ်ဆေးခြင်း
+    // 🔴 Sidebar စစ်ဆေးခြင်း (Profile ပုံပါ ပြမယ်)
     if (localStorage.getItem('username')) {
         document.getElementById('navLogin').style.display = 'none';
         document.getElementById('navAccount').style.display = 'flex'; 
+        
+        // Local Storage ထဲမှာ ပုံရှိရင် Sidebar မှာ ပြမယ်
+        const savedPic = localStorage.getItem('profile_pic');
+        if (savedPic) {
+            document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
     }
 
     function toggleMenu() {
@@ -117,7 +125,8 @@
             videos.forEach(video => {
                 const card = document.createElement('div');
                 card.className = 'card video-card';
-                card.onclick = () => playVideo(video.file_id);
+                // 🔴 video.id ကိုပါ ထည့်ခေါ်ထားပါတယ် (Views တွက်ဖို့)
+                card.onclick = () => playVideo(video.file_id, video.id);
                 card.innerHTML = `
                     <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
                     <div class="title">${video.title}</div>
@@ -130,36 +139,42 @@
         }
     }
 
-    // ၁။ ဗီဒီယို ဖွင့်ခြင်း (Player အသစ် ထပ်မဆောက်တော့ဘဲ ရှိပြီးသားကို ပြင်မယ်)
-function playVideo(fileId) {
-    const modal = document.getElementById('playerModal');
-    const video = document.getElementById('mainPlayer');
-    const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`;
+    // ၁။ ဗီဒီယို ဖွင့်ခြင်း (videoId ကို ပါ လက်ခံမယ်)
+    function playVideo(fileId, videoId) {
+        const modal = document.getElementById('playerModal');
+        const video = document.getElementById('mainPlayer');
+        const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`;
 
-    modal.style.display = 'flex';
+        modal.style.display = 'flex';
 
-    if (!player) {
-        player = new Plyr(video, {
-            controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-            // 🔴 ဖုန်း Screen မှာ ခလုတ်တွေ အတင်းပေါ်စေရန် ဒီ (၂) ကြောင်း ထည့်ပါ
-            settings: ['captions', 'quality', 'speed', 'loop'],
-            fullscreen: { enabled: true, fallback: true, iosNative: true }
-        });
+        if (!player) {
+            player = new Plyr(video, {
+                controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                settings: ['captions', 'quality', 'speed', 'loop'],
+                fullscreen: { enabled: true, fallback: true, iosNative: true }
+            });
+        }
+
+        video.src = streamUrl;
+        player.play().catch(e => console.log("Autoplay blocked", e));
+
+        // 🔴 အသစ်ထည့်ရန် - Views တိုးစေမယ့် API ကို လှမ်းခေါ်မယ်
+        fetch(`${API_URL}/api/videos/view`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: videoId })
+        }).catch(e => console.log("View count error", e));
     }
 
-    video.src = streamUrl;
-    player.play().catch(e => console.log("Autoplay blocked", e));
-}
-
-// ၂။ ဗီဒီယို ပိတ်ခြင်း (Player ကို မဖျက်ဘဲ ခေတ္တရပ်ထားမယ်)
-function closePlayer() {
-    const modal = document.getElementById('playerModal');
-    modal.style.display = 'none';
-    
-    if (player) {
-        player.pause(); // ခေတ္တ ရပ်ခိုင်းမယ်။ ဖျက်မှာ မဟုတ်ပါဘူး။
+    // ၂။ ဗီဒီယို ပိတ်ခြင်း (Player ကို မဖျက်ဘဲ ခေတ္တရပ်ထားမယ်)
+    function closePlayer() {
+        const modal = document.getElementById('playerModal');
+        modal.style.display = 'none';
+        
+        if (player) {
+            player.pause(); 
+        }
     }
-}
 
     // စာမျက်နှာ စတင်တာနဲ့ အလုပ်လုပ်မယ်
     loadVideos();
