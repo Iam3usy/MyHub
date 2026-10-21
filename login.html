@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login</title>
     
-    <!-- Google Font နဲ့ CSS ချိတ်ဆက်ခြင်း -->
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* Login Page အတွက် သီးသန့် နေရာချထားမှု */
+        /* Login Page */
         body { 
             display: flex; 
             justify-content: center; 
@@ -57,7 +57,8 @@
         <div class="form-box">
             <h2 style="text-align: center; color: var(--primary); margin-bottom: 20px;">Login</h2>
             
-            <!-- Enter နှိပ်ရင်လည်း Login ဝင်အောင် onkeypress ထည့်ထားတယ် -->
+        <!--Enter Login-->
+            
             <input type="text" id="username" placeholder="Username" onkeypress="handleEnter(event)">
             <input type="password" id="key_code" placeholder="VIP Key" onkeypress="handleEnter(event)">
             
@@ -66,76 +67,78 @@
             <p id="errorMsg" class="error"></p>
 
             <!-- Back to Home Link -->
-            <a href="index.html" class="back-home">← Back to Home</a>
+            <a href="index.html" class="back-home"> Back to Home</a>
         </div>
     </div>
 
-    <script>
-        const API_URL = "https://myhubapp.dathalay1.workers.dev"; // မင်း Worker Link
-
-        // Enter နှိပ်ရင် Login ဝင်အောင် လုပ်မယ့် Function
-        function handleEnter(e) {
-            if (e.key === 'Enter') {
-                login();
-            }
+<script>
+    const API_URL = "https://myhubapp.dathalay1.workers.dev";
+    
+    function handleEnter(e) {
+        if (e.key === 'Enter') {
+            login();
         }
-
-        // Device ID ထုတ်ယူခြင်း (Browser တစ်ခုကို တစ်ခုတည်းသတ်မှတ်ဖို့)
-        function getDeviceId() {
-            let devId = localStorage.getItem('device_id');
-            if (!devId) {
-                devId = 'dev_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('device_id', devId);
-            }
-            return devId;
+    }
+    
+    function getDeviceId() {
+        let devId = localStorage.getItem('device_id');
+        if (!devId) {
+            devId = 'dev_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('device_id', devId);
         }
-
-        async function login() {
-            const username = document.getElementById('username').value;
-            const key_code = document.getElementById('key_code').value;
-            const device_id = getDeviceId();
-            const btn = document.getElementById('loginBtn');
-            const errorMsg = document.getElementById('errorMsg');
-
-            if(!username || !key_code) {
-                errorMsg.innerText = "Please fill in all fields";
-                return;
-            }
-
-            // ခလုတ်ကို Loading ပြမယ်
-            btn.innerText = "Checking...";
-            btn.disabled = true;
-            btn.style.opacity = "0.7";
-            errorMsg.innerText = "";
-
-            try {
-                const res = await fetch(`${API_URL}/api/login`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ username, key_code, device_id })
-                });
+        return devId;
+    }
+    
+    async function login() {
+        const username = document.getElementById('username').value;
+        const key_code = document.getElementById('key_code').value;
+        const device_id = getDeviceId();
+        const btn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        
+        if (!username || !key_code) {
+            errorMsg.innerText = "Please fill in all fields";
+            return;
+        }
+        
+        btn.innerText = "Checking...";
+        btn.disabled = true;
+        btn.style.opacity = "0.7";
+        errorMsg.innerText = "";
+        
+        try {
+            const res = await fetch(`${API_URL}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, key_code, device_id })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                // 🔴Save Account Data
+                localStorage.setItem('username', data.user.username);
+                localStorage.setItem('expired_date', data.user.expired_date);
                 
-                const data = await res.json();
                 
-                if (res.ok) {
-                    // အောင်မြင်ရင် Browser မှာ သိမ်းမယ်
-                    localStorage.setItem('username', data.user.username);
-                    localStorage.setItem('expired_date', data.user.expired_date);
-                    window.location.href = 'account.html'; // Account Page
-                } else {
-                    errorMsg.innerText = data.error;
-                    // မအောင်မြင်ရင် ခလုတ်ကို ပုံမှန်ပြန်ထားမယ်
-                    btn.innerText = "Login";
-                    btn.disabled = false;
-                    btn.style.opacity = "1";
+                if (!localStorage.getItem('profile_pic') && data.user.profile_pic) {
+                    localStorage.setItem('profile_pic', data.user.profile_pic);
                 }
-            } catch (error) {
-                errorMsg.innerText = "Server error. Please try again.";
+                
+                window.location.href = 'account.html';
+            } else {
+                errorMsg.innerText = data.error;
                 btn.innerText = "Login";
                 btn.disabled = false;
                 btn.style.opacity = "1";
             }
+        } catch (error) {
+            errorMsg.innerText = "Server error. Please try again.";
+            btn.innerText = "Login";
+            btn.disabled = false;
+            btn.style.opacity = "1";
         }
-    </script>
+    }
+</script>
 </body>
 </html>
