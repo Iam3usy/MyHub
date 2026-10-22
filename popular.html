@@ -124,8 +124,8 @@
             videos.forEach((video, index) => {
                 const card = document.createElement('div');
                 card.className = 'card video-card';
-                // 🔴 ideos count
-                card.onclick = () => playVideo(video.file_id, video.id);
+                // 🔴 Videos count
+                card.onclick = () => playVideo(video.file_id, video.id, video.worker_id);
                 
                 // 🔴 Views  
                 let viewCount = video.views || 0;
@@ -158,30 +158,39 @@
     }
 
     // Load Videos 
-    function playVideo(fileId, videoId) {
-        const modal = document.getElementById('playerModal');
-        const video = document.getElementById('mainPlayer');
-        const streamUrl = `${API_URL}/stream?file_id=${encodeURIComponent(fileId)}`;
+    function playVideo(fileId, videoId, workerId) {
+    const modal = document.getElementById('playerModal');
+    const video = document.getElementById('mainPlayer');
+    
+    // 🔴 Worker ID အလိုက် Link ကို ရွေးမယ်
+    let streamBaseUrl = "";
+    if (workerId == 2) {
+        streamBaseUrl = "https://myapp.8tetaun9.workers.dev"; // Worker 2
+    } else {
+        streamBaseUrl = "https://myhubapp.dathalay1.workers.dev"; // Worker 1 (Default)
+    }
 
-        modal.style.display = 'flex';
+    const streamUrl = `${streamBaseUrl}/stream?file_id=${encodeURIComponent(fileId)}`;
 
-        if (!player) {
-            player = new Plyr(video, {
-                controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-                settings: ['captions', 'quality', 'speed', 'loop'],
-                fullscreen: { enabled: true, fallback: true, iosNative: true }
-            });
-        }
+    modal.style.display = 'flex';
 
-        video.src = streamUrl;
-        player.play().catch(e => console.log("Autoplay blocked", e));
+    if (!player) {
+        player = new Plyr(video, {
+            controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+            settings: ['captions', 'quality', 'speed', 'loop'],
+            fullscreen: { enabled: true, fallback: true, iosNative: true }
+        });
+    }
 
-        // Views 
-        fetch(`${API_URL}/api/videos/view`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: videoId })
-        }).catch(e => console.log("View count error", e));
+    video.src = streamUrl;
+    player.play().catch(e => console.log("Autoplay blocked", e));
+
+    // Views တိုးစေမယ့် API (ဒါက Main Worker ကိုပဲ ခေါ်မယ်)
+    fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: videoId })
+    }).catch(e => console.log("View count error", e));
     }
 
     // Closed Player
