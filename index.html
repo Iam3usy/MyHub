@@ -7,7 +7,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Plyr CSS -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 </head>
 <body>
@@ -15,7 +14,6 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <!-- 🔴 Sidebar Profile -->
         <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
         <h2>MyVideo</h2>
         <p>Premium Streaming</p>
@@ -47,7 +45,7 @@
     <div class="grid video-grid" id="videoGrid">
         <div class="loading-wrapper" style="grid-column: span 3;">
             <div class="spinner"></div>
-            <p>Please Wait . . .</p>
+            <p>Please Wait...</p>
         </div>
     </div>
 </div>
@@ -75,13 +73,11 @@
     const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
     let player; 
 
-    //  Sidebar Check
-    
+    // Sidebar စစ်ဆေးခြင်း
     if (localStorage.getItem('username')) {
         document.getElementById('navLogin').style.display = 'none';
         document.getElementById('navAccount').style.display = 'flex'; 
         
-        // Save Pic
         const savedPic = localStorage.getItem('profile_pic');
         if (savedPic) {
             document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
@@ -103,12 +99,11 @@
         document.getElementById('videoGrid').innerHTML = `
             <div class="loading-wrapper" style="grid-column: span 2;">
                 <div class="spinner"></div>
-                <p>Please Wait . . .</p>
+                <p>ခဏစောင့်ပါ...</p>
             </div>`;
         loadVideos();
     }
 
-    // Load Video 
     async function loadVideos() {
         const grid = document.getElementById('videoGrid');
         try {
@@ -119,14 +114,14 @@
             grid.innerHTML = ''; 
 
             if(videos.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column: span 2; color:#888; margin-top: 20px;">No Videos for this content</p>';
+                grid.innerHTML = '<p style="text-align:center; grid-column: span 2; color:#888; margin-top: 20px;">ဇာတ်ကား မရှိသေးပါ။</p>';
                 return;
             }
 
             videos.forEach(video => {
                 const card = document.createElement('div');
                 card.className = 'card video-card';
-                // 🔴 video.id ကိုပါ ထည့်ခေါ်ထားပါတယ် (Views တွက်ဖို့)
+                // 🔴 worker_id ကို ပါ ထည့်ခေါ်ထားတယ်
                 card.onclick = () => playVideo(video.file_id, video.id, video.worker_id);
                 card.innerHTML = `
                     <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
@@ -140,44 +135,41 @@
         }
     }
 
-    // Play Video 
-    function playVideo(fileId, videoId) {
     function playVideo(fileId, videoId, workerId) {
-    const modal = document.getElementById('playerModal');
-    const video = document.getElementById('mainPlayer');
-    
-    // 🔴 Worker ID အလိုက် Link ကို ရွေးမယ်
-    let streamBaseUrl = "";
-    if (workerId == 2) {
-        streamBaseUrl = "https://myapp.8tetaun9.workers.dev"; // Worker 2
-    } else {
-        streamBaseUrl = "https://myhubapp.dathalay1.workers.dev"; // Worker 1 (Default)
+        const modal = document.getElementById('playerModal');
+        const video = document.getElementById('mainPlayer');
+        
+        // 🔴 Worker ID အလိုက် Link ကို ရွေးမယ်
+        let streamBaseUrl = "";
+        if (workerId == 2) {
+            streamBaseUrl = "https://myapp.8tetaun9.workers.dev"; // Worker 2
+        } else {
+            streamBaseUrl = "https://myhubapp.dathalay1.workers.dev"; // Worker 1 (Default)
+        }
+
+        const streamUrl = `${streamBaseUrl}/stream?file_id=${encodeURIComponent(fileId)}`;
+
+        modal.style.display = 'flex';
+
+        if (!player) {
+            player = new Plyr(video, {
+                controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                settings: ['captions', 'quality', 'speed', 'loop'],
+                fullscreen: { enabled: true, fallback: true, iosNative: true }
+            });
+        }
+
+        video.src = streamUrl;
+        player.play().catch(e => console.log("Autoplay blocked", e));
+
+        // Views တိုးစေမယ့် API (ဒါက Main Worker ကိုပဲ ခေါ်မယ်)
+        fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: videoId })
+        }).catch(e => console.log("View count error", e));
     }
 
-    const streamUrl = `${streamBaseUrl}/stream?file_id=${encodeURIComponent(fileId)}`;
-
-    modal.style.display = 'flex';
-
-    if (!player) {
-        player = new Plyr(video, {
-            controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-            settings: ['captions', 'quality', 'speed', 'loop'],
-            fullscreen: { enabled: true, fallback: true, iosNative: true }
-        });
-    }
-
-    video.src = streamUrl;
-    player.play().catch(e => console.log("Autoplay blocked", e));
-
-    // Views တိုးစေမယ့် API (ဒါက Main Worker ကိုပဲ ခေါ်မယ်)
-    fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: videoId })
-    }).catch(e => console.log("View count error", e));
-}
-
-    // close player 
     function closePlayer() {
         const modal = document.getElementById('playerModal');
         modal.style.display = 'none';
