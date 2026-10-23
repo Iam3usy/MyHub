@@ -66,7 +66,7 @@
     <div class="grid video-grid" id="videoGrid">
         <div class="loading-wrapper" style="grid-column: span 3;">
             <div class="spinner"></div>
-            <p>Please Wait...</p>
+            <p>Please Wait . . .</p>
         </div>
     </div>
 </div>
@@ -119,7 +119,7 @@
         document.getElementById('videoGrid').innerHTML = `
             <div class="loading-wrapper" style="grid-column: span 2;">
                 <div class="spinner"></div>
-                <p>ခဏစောင့်ပါ...</p>
+                <p>Please Wait . . .</p>
             </div>`;
         loadVideos();
     }
@@ -141,7 +141,7 @@
             videos.forEach(video => {
                 const card = document.createElement('div');
                 card.className = 'card video-card';
-                // 🔴 worker_id ကို ပါ ထည့်ခေါ်ထားတယ်
+                
                 card.onclick = () => playVideo(video.file_id, video.id, video.worker_id);
                 card.innerHTML = `
                     <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
@@ -159,7 +159,7 @@
         const modal = document.getElementById('playerModal');
         const video = document.getElementById('mainPlayer');
         
-        // 🔴 Worker ID အလိုက် Link ကို ရွေးမယ်
+        // 🔴 Worker ID
         let streamBaseUrl = "";
         if (workerId == 2) {
             streamBaseUrl = "https://myapp.8tetaun9.workers.dev"; // Worker 2
@@ -182,7 +182,7 @@
         video.src = streamUrl;
         player.play().catch(e => console.log("Autoplay blocked", e));
 
-        // Views တိုးစေမယ့် API (ဒါက Main Worker ကိုပဲ ခေါ်မယ်)
+        // Views API 
         fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -201,7 +201,6 @@
 
     loadVideos();
 </script>
-        <!-- 🔴 ဒီနေရာမှာ ထည့်ပါ -->
 <script src="https://unpkg.com/feather-icons"></script>
 <script>
         feather.replace();
