@@ -49,7 +49,7 @@
     <div class="sidebar-header">
         <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
         <h2>My Hub</h2>
-        <p>Play with Me</p>
+        <p>P l a y   w i t h  M e</p>
     </div>
     
     <div class="sidebar-links">
@@ -129,10 +129,9 @@
     const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
     let player; 
 
-    // Feather 
     feather.replace();
 
-    // Sidebar Check 
+    // Sidebar Check
     if (localStorage.getItem('username')) {
         document.getElementById('navLogin').style.display = 'none';
         document.getElementById('navAccount').style.display = 'flex'; 
@@ -161,11 +160,13 @@
         if (e.key === 'Enter') searchAll();
     }
 
-    // 🔴 ရှာဖွေခြင်း Function (ဗီဒီယို၊ မော်ဒယ်၊ Category အကုန်ရှာမယ်)
+    // 🔴 Search Function (Login Access စစ်ဆေးမှုပါဝင်သည်)
     async function searchAll() {
         const query = document.getElementById('searchInput').value.trim().toLowerCase();
         const resultsDiv = document.getElementById('searchResults');
-        const msgDiv = document.getElementById('searchMessage');
+
+        // Login ဝင်ထားခြင်း ရှိမရှိ စစ်ဆေးမယ်
+        const isLoggedIn = localStorage.getItem('username') ? true : false;
 
         if (query === '') {
             resultsDiv.innerHTML = '<div style="grid-column: span 3; text-align: center; color: #888; margin-top: 20px;">Type something to search...</div>';
@@ -175,7 +176,6 @@
         resultsDiv.innerHTML = '<div class="loading-wrapper" style="grid-column: span 3;"><div class="spinner"></div><p>Searching...</p></div>';
 
         try {
-            // Data တွေ အကုန်လုံး ဆွဲထုတ်မယ်
             const [videosRes, modelsRes, categoriesRes] = await Promise.all([
                 fetch(`${API_URL}/api/videos`),
                 fetch(`${API_URL}/api/models`),
@@ -186,30 +186,12 @@
             const models = await modelsRes.json();
             const categories = await categoriesRes.json();
 
-            
             let resultHTML = '';
 
-            
-
-            // Model 
-            const matchedModels = models.filter(m => m.name.toLowerCase().includes(query));
-            if (matchedModels.length > 0) {
-                resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin-top: 10px;">Models</h3>`;
-                resultHTML += matchedModels.map(m => `
-                    <a href="model.html?id=${m.id}&name=${encodeURIComponent(m.name)}" class="card model-card">
-                        <img src="${m.image || 'https://via.placeholder.com/150'}" alt="${m.name}">
-                        <p class="title" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 0;">
-                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.name}</span>
-                            <span style="color: #00e676; font-size: 11px; font-weight: bold;">🎥 ${m.video_count || 0}</span>
-                        </p>
-                    </a>
-                `).join('');
-            }
-
-            // Category 
+            // 1. Category
             const matchedCategories = categories.filter(c => c.name.toLowerCase().includes(query));
             if (matchedCategories.length > 0) {
-                resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin-top: 10px;">Categories</h3>`;
+                resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin: 15px 0 10px 0;">Categories</h3>`;
                 resultHTML += matchedCategories.map(c => `
                     <a href="category.html?id=${c.id}&name=${encodeURIComponent(c.name)}" class="card model-card">
                         <img src="${c.image || 'https://via.placeholder.com/150'}" alt="${c.name}">
@@ -221,19 +203,41 @@
                 `).join('');
             }
 
-            // Video 
-            const matchedVideos = videos.filter(v => v.title.toLowerCase().includes(query));
+            // 2. Model
+            const matchedModels = models.filter(m => m.name.toLowerCase().includes(query));
+            if (matchedModels.length > 0) {
+                resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin: 15px 0 10px 0;">Models</h3>`;
+                resultHTML += matchedModels.map(m => `
+                    <a href="model.html?id=${m.id}&name=${encodeURIComponent(m.name)}" class="card model-card">
+                        <img src="${m.image || 'https://via.placeholder.com/150'}" alt="${m.name}">
+                        <p class="title" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 0;">
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.name}</span>
+                            <span style="color: #00e676; font-size: 11px; font-weight: bold;">🎥 ${m.video_count || 0}</span>
+                        </p>
+                    </a>
+                `).join('');
+            }
+
+            // 3. Video
+            // 🔴 Login မဝင်ထားရင် is_vip = 0 ဖြစ်တဲ့ Video တွေပဲ ရှာမယ်။ Login ဝင်ထားရင် အကုန်ရှာမယ်။
+            let matchedVideos = videos.filter(v => v.title.toLowerCase().includes(query));
+            
+            if (!isLoggedIn) {
+                matchedVideos = matchedVideos.filter(v => v.is_vip == 0); // VIP Video တွေကို ဖျောက်မယ်
+            }
+
             if (matchedVideos.length > 0) {
-                resultHTML += `<h3 style="grid-column: span 2; color: var(--primary); margin-top: 10px;">Videos</h3>`;
+                resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin: 15px 0 10px 0;">Videos</h3>`;
+                resultHTML += `<div style="grid-column: span 3; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
                 resultHTML += matchedVideos.map(v => `
                     <div class="card video-card" onclick="playVideo('${v.file_id}', ${v.id}, ${v.worker_id})">
                         <video src="${v.preview_url || ''}" autoplay loop muted playsinline></video>
                         <div class="title">${v.title}</div>
                     </div>
                 `).join('');
+                resultHTML += `</div>`;
             }
 
-            // No results 
             if (resultHTML === '') {
                 resultsDiv.innerHTML = `<div style="grid-column: span 3; text-align: center; color: #888; margin-top: 20px;">No results found for "${query}"</div>`;
             } else {
@@ -246,7 +250,6 @@
         }
     }
 
-    // 🔴 play video
     function playVideo(fileId, videoId, workerId) {
         const modal = document.getElementById('playerModal');
         const video = document.getElementById('mainPlayer');
@@ -273,7 +276,6 @@
         video.src = streamUrl;
         player.play().catch(e => console.log("Autoplay blocked", e));
 
-        // Views API
         fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
