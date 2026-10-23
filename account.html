@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Account</title>
     
-    <!-- Google Font နဲ့ CSS ချိတ်ဆက်ခြင်း -->
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* Account Page အတွက် သီးသန့် နေရာချထားမှုများ */
+        /* Account Page*/
         .account-container { padding: 20px; text-align: center; }
         
         .profile-img { 
@@ -70,8 +70,8 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="profile-img">👤</div>
-            <h2>MyVideo</h2>
-            <p>Premium Streaming</p>
+            <h2>My Hub</h2>
+            <p>Streaming</p>
         </div>
         
     <div class="sidebar-links">
@@ -96,7 +96,7 @@
     <a href="login.html" id="navLogin" style="color: #00d2ff;">
         <span class="icon"><i data-feather="key"></i></span> Login
     </a>
-    <a href="account.html" id="navAccount" style="display: none; color: #00ff88;">
+    <a href="account.html" id="navAccount" class="active" style="display: none; color: #00ff88;">
         <span class="icon"><i data-feather="settings"></i></span> My Account
     </a>
     </div>
@@ -124,7 +124,7 @@
             <h3>Renew Key</h3>
             <p>အောက်ပါ Button များမှတဆင့် ဆက်သွယ်ပြီး Key သက်တမ်းတိုးနိုင်ပါသည်။</p>
             <div class="btn-group">
-                <!-- မင်းရဲ့ ဖုန်းနံပါတ်နဲ့ Telegram Link ကို ဒီမှာ ထည့်ပါ -->
+                <!-- Viber and Telegram Link-->
                 <a href="viber://chat?number=+959xxxxxxxxx" class="btn btn-viber">📞 Viber</a>
                 <a href="https://t.me/yourusername" class="btn btn-tg">✈️ Telegram</a>
             </div>
@@ -158,7 +158,7 @@
             btn.innerText = "Please Wait...";
             btn.disabled = true;
 
-            // Database ထဲက Device ID ကို ဖျက်မယ်
+            // Delete Device ID
             try {
                 await fetch(`${API_URL}/api/logout`, {
                     method: 'POST',
@@ -167,10 +167,10 @@
                 });
             } catch (e) { console.log(e); }
 
-            // Browser ထဲက Data တွေ ရှင်းမယ်
+            
             localStorage.removeItem('username');
             localStorage.removeItem('expired_date');
-            // device_id ကို မဖျက်ပါဘူး (ဒါမှ ပြန်ဝင်ရင် အလွယ်တကူ ဝင်လို့ရမှာ)
+            
             
             window.location.href = 'index.html';
         }
