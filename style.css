@@ -53,11 +53,11 @@ a { text-decoration: none; color: inherit; }
 .sidebar-header .profile-img {
     width: 80px; height: 80px; border-radius: 50%; 
     background: linear-gradient(135deg, #1e1e24, #000);
-    border: 2px solid rgba(255, 0, 80, 0.5); 
+    border: none; 
     margin: 0 auto 15px; position: relative; z-index: 1;
     display: flex; align-items: center; justify-content: center; font-size: 35px;
-    box-shadow: 0 0 20px rgba(255, 0, 80, 0.4);
-    overflow: hidden; /* 🔴 ဒါလေး ထည့်ပေးပါ */
+    box-shadow: none;
+    overflow: hidden; 
 }
 .sidebar.open { left: 0; }
 
