@@ -5,75 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login</title>
     
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* Login Page */
-        body { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            padding: 0;
-        }
         .login-container {
-            width: 90%;
-            max-width: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 65px);
+            padding: 20px;
         }
-        .error { 
-            color: var(--primary); 
-            font-size: 14px; 
-            text-align: center; 
-            margin-top: 15px; 
-            font-weight: bold;
-        }
-        .back-home {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 14px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        .back-home:hover, .back-home:active {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-main);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: scale(0.98);
-        }
-
+        .form-box { width: 100%; max-width: 400px; }
+        .error { color: var(--primary); font-size: 14px; text-align: center; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <div class="form-box">
-            <h2 style="text-align: center; color: var(--primary); margin-bottom: 20px;">Login</h2>
-            
-        <!--Enter Login-->
-            
-            <input type="text" id="username" placeholder="Username" onkeypress="handleEnter(event)">
-            <input type="password" id="key_code" placeholder="VIP Key" onkeypress="handleEnter(event)">
-            
-            <button onclick="login()" id="loginBtn">Login</button>
-            
-            <p id="errorMsg" class="error"></p>
-
-            <!-- Back to Home Link -->
-            <a href="index.html" class="back-home"> Back to Home</a>
-        </div>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
+        <h2>My Hub</h2>
+        <p>Streaming</p>
     </div>
+    
+    <div class="sidebar-links">
+        <a href="index.html">
+            <span class="icon"><i data-feather="home"></i></span> Home
+        </a>
+        <a href="popular.html">
+            <span class="icon"><i data-feather="trending-up"></i></span> Popular
+        </a>
+        <a href="models.html">
+            <span class="icon"><i data-feather="users"></i></span> Models
+        </a>
+        <a href="categories.html">
+            <span class="icon"><i data-feather="film"></i></span> Categories
+        </a>
+        <a href="search.html">
+            <span class="icon"><i data-feather="search"></i></span> Search
+        </a>
+        <a href="vip.html" style="color: gold;">
+            <span class="icon"><i data-feather="award"></i></span> VIP Videos
+        </a>
+        
+        <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+        
+        <a href="login.html" id="navLogin" class="active" style="color: #00d2ff;">
+            <span class="icon"><i data-feather="key"></i></span> Login
+        </a>
+        <a href="account.html" id="navAccount" style="display: none; color: #00ff88;">
+            <span class="icon"><i data-feather="settings"></i></span> My Account
+        </a>
+    </div>
+</div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<!-- Navbar -->
+<div class="navbar">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <h1 class="logo">Login</h1>
+</div>
+
+<!-- Content -->
+<div class="login-container">
+    <div class="form-box">
+        <h2 style="text-align: center; color: var(--primary); margin-bottom: 20px;">Login</h2>
+        
+        <input type="text" id="username" placeholder="Username" onkeypress="handleEnter(event)">
+        <input type="password" id="key_code" placeholder="VIP Key" onkeypress="handleEnter(event)">
+        
+        <button onclick="login()" id="loginBtn">Login</button>
+        
+        <p id="errorMsg" class="error"></p>
+    </div>
+</div>
+
+<!-- Feather Icons -->
+<script src="https://unpkg.com/feather-icons"></script>
 
 <script>
-    const API_URL = "https://myhubapp.dathalay1.workers.dev";
+    feather.replace();
     
+    const API_URL = "https://myhubapp.dathalay1.workers.dev";
+
+    if (localStorage.getItem('username')) {
+        document.getElementById('navLogin').style.display = 'none';
+        document.getElementById('navAccount').style.display = 'flex'; 
+        
+        const savedPic = localStorage.getItem('profile_pic');
+        if (savedPic) {
+            document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    }
+    
+    function toggleMenu() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('show');
+    }
+
     function handleEnter(e) {
         if (e.key === 'Enter') {
             login();
@@ -116,10 +147,8 @@
             const data = await res.json();
             
             if (res.ok) {
-                // 🔴Save Account Data
                 localStorage.setItem('username', data.user.username);
                 localStorage.setItem('expired_date', data.user.expired_date);
-                
                 
                 if (!localStorage.getItem('profile_pic') && data.user.profile_pic) {
                     localStorage.setItem('profile_pic', data.user.profile_pic);
