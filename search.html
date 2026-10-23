@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Search - Premium Videos</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    
+    <style>
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 15px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            font-family: 'Padauk';
+            font-size: 16px;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+        .search-box button {
+            padding: 0 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Padauk';
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
+        <h2>MyVideo</h2>
+        <p>Premium Streaming</p>
+    </div>
+    
+    <div class="sidebar-links">
+        <a href="index.html">
+            <span class="icon"><i data-feather="home"></i></span> Home
+        </a>
+        <a href="popular.html">
+            <span class="icon"><i data-feather="trending-up"></i></span> Popular
+        </a>
+        <a href="models.html">
+            <span class="icon"><i data-feather="users"></i></span> Models
+        </a>
+        <a href="categories.html">
+            <span class="icon"><i data-feather="film"></i></span> Categories
+        </a>
+        <a href="search.html" class="active">
+            <span class="icon"><i data-feather="search"></i></span> Search
+        </a>
+        <a href="vip.html" style="color: gold;">
+            <span class="icon"><i data-feather="award"></i></span> VIP Videos
+        </a>
+        
+        <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+        
+        <a href="login.html" id="navLogin" style="color: #00d2ff;">
+            <span class="icon"><i data-feather="key"></i></span> Login
+        </a>
+        <a href="account.html" id="navAccount" style="display: none; color: #00ff88;">
+            <span class="icon"><i data-feather="settings"></i></span> My Account
+        </a>
+    </div>
+</div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<!-- Navbar -->
+<div class="navbar">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <h1 class="logo">Search</h1>
+</div>
+
+<!-- Content -->
+<div class="container">
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search videos, models, categories..." onkeypress="handleEnter(event)">
+        <button onclick="searchAll()">Search</button>
+    </div>
+
+    <!-- Search Results Grid -->
+    <div class="grid" id="searchResults">
+        <div id="searchMessage" style="grid-column: span 3; text-align: center; color: #888; margin-top: 20px;">
+            Type something to search...
+        </div>
+    </div>
+</div>
+
+<!-- Custom Error Popup -->
+<div id="customPopup">
+    <div class="popup-content">
+        <div class="popup-icon">⚠️</div>
+        <div class="popup-title">Error</div>
+        <div class="popup-message" id="popupMsg">Cannot connect to the server</div>
+        <button class="popup-btn" onclick="closePopup()">Retry</button>
+    </div>
+</div>
+
+<!-- Player Modal -->
+<div id="playerModal">
+    <button id="closeBtn" onclick="closePlayer()">✕</button>
+    <video id="mainPlayer" controls playsinline></video>
+</div>
+
+<!-- Plyr & Feather JS -->
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<script src="https://unpkg.com/feather-icons"></script>
+
+<script>
+    const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
+    let player; 
+
+    // 🔴 Feather Icons ကို အလုပ်လုပ်ခိုင်းမယ်
+    feather.replace();
+
+    // Sidebar စစ်ဆေးခြင်း
+    if (localStorage.getItem('username')) {
+        document.getElementById('navLogin').style.display = 'none';
+        document.getElementById('navAccount').style.display = 'flex'; 
+        
+        const savedPic = localStorage.getItem('profile_pic');
+        if (savedPic) {
+            document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    }
+
+    function toggleMenu() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('show');
+    }
+
+    function showErrorPopup(message) {
+        document.getElementById('popupMsg').innerText = message;
+        document.getElementById('customPopup').style.display = 'flex';
+    }
+
+    function closePopup() {
+        document.getElementById('customPopup').style.display = 'none';
+    }
+
+    function handleEnter(e) {
+        if (e.key === 'Enter') searchAll();
+    }
+
+    // 🔴 ရှာဖွေခြင်း Function (ဗီဒီယို၊ မော်ဒယ်၊ Category အကုန်ရှာမယ်)
+    async function searchAll() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        const resultsDiv = document.getElementById('searchResults');
+        const msgDiv = document.getElementById('searchMessage');
+
+        if (query === '') {
+            resultsDiv.innerHTML = '<div style="grid-column: span 3; text-align: center; color: #888; margin-top: 20px;">Type something to search...</div>';
+            return;
+        }
+
+        resultsDiv.innerHTML = '<div class="loading-wrapper" style="grid-column: span 3;"><div class="spinner"></div><p>Searching...</p></div>';
+
+        try {
+            // Data တွေ အကုန်လုံး ဆွဲထုတ်မယ်
+            const [videosRes, modelsRes, categoriesRes] = await Promise.all([
+                fetch(`${API_URL}/api/videos`),
+                fetch(`${API_URL}/api/models`),
+                fetch(`${API_URL}/api/categories`)
+            ]);
+
+            const videos = await videosRes.json();
+            const models = await modelsRes.json();
+            const categories = await categoriesRes.json();
+
+            // ရှာလို့ တွေ့တာတွေကို သိမ်းမယ်
+            let resultHTML = '';
+
+            // ၁။ ဗီဒီယိုတွေ ရှာမယ်
+            const matchedVideos = videos.filter(v => v.title.toLowerCase().includes(query));
+            if (matchedVideos.length > 0) {
+                resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin-top: 10px;">Videos</h3>`;
+                resultHTML += matchedVideos.map(v => `
+                    <div class="card video-card" onclick="playVideo('${v.file_id}', ${v.id}, ${v.worker_id})">
+                        <video src="${v.preview_url || ''}" autoplay loop muted playsinline></video>
+                        <div class="title">${v.title}</div>
+                    </div>
+                `).join('');
+            }
+
+            // ၂။ မော်ဒယ်တွေ ရှာမယ်
+            const matchedModels = models.filter(m => m.name.toLowerCase().includes(query));
+            if (matchedModels.length > 0) {
+                resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin-top: 10px;">Models</h3>`;
+                resultHTML += matchedModels.map(m => `
+                    <a href="model.html?id=${m.id}&name=${encodeURIComponent(m.name)}" class="card model-card">
+                        <img src="${m.image || 'https://via.placeholder.com/150'}" alt="${m.name}">
+                        <p class="title" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 0;">
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.name}</span>
+                            <span style="color: #00e676; font-size: 11px; font-weight: bold;">🎥 ${m.video_count || 0}</span>
+                        </p>
+                    </a>
+                `).join('');
+            }
+
+            // ၃။ Category တွေ ရှာမယ်
+            const matchedCategories = categories.filter(c => c.name.toLowerCase().includes(query));
+            if (matchedCategories.length > 0) {
+                resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin-top: 10px;">Categories</h3>`;
+                resultHTML += matchedCategories.map(c => `
+                    <a href="category.html?id=${c.id}&name=${encodeURIComponent(c.name)}" class="card model-card">
+                        <img src="${c.image || 'https://via.placeholder.com/150'}" alt="${c.name}">
+                        <p class="title" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 0;">
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${c.name}</span>
+                            <span style="color: #00e676; font-size: 11px; font-weight: bold;">🎥 ${c.video_count || 0}</span>
+                        </p>
+                    </a>
+                `).join('');
+            }
+
+            // ရလဒ် မရှိရင်
+            if (resultHTML === '') {
+                resultsDiv.innerHTML = `<div style="grid-column: span 3; text-align: center; color: #888; margin-top: 20px;">No results found for "${query}"</div>`;
+            } else {
+                resultsDiv.innerHTML = resultHTML;
+            }
+
+        } catch (error) {
+            resultsDiv.innerHTML = ''; 
+            showErrorPopup("Network Error");
+        }
+    }
+
+    // 🔴 ဗီဒီယိုဖွင့်ခြင်း
+    function playVideo(fileId, videoId, workerId) {
+        const modal = document.getElementById('playerModal');
+        const video = document.getElementById('mainPlayer');
+        
+        let streamBaseUrl = "";
+        if (workerId == 2) {
+            streamBaseUrl = "https://myapp.8tetaun9.workers.dev";
+        } else {
+            streamBaseUrl = "https://myhubapp.dathalay1.workers.dev";
+        }
+
+        const streamUrl = `${streamBaseUrl}/stream?file_id=${encodeURIComponent(fileId)}`;
+
+        modal.style.display = 'flex';
+
+        if (!player) {
+            player = new Plyr(video, {
+                controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                settings: ['captions', 'quality', 'speed', 'loop'],
+                fullscreen: { enabled: true, fallback: true, iosNative: true }
+            });
+        }
+
+        video.src = streamUrl;
+        player.play().catch(e => console.log("Autoplay blocked", e));
+
+        // Views တိုးစေမယ့် API
+        fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: videoId })
+        }).catch(e => console.log("View count error", e));
+    }
+
+    function closePlayer() {
+        const modal = document.getElementById('playerModal');
+        modal.style.display = 'none';
+        
+        if (player) {
+            player.pause(); 
+        }
+    }
+
+</script>
+</body>
+</html>8
