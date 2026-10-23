@@ -10,53 +10,51 @@
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 </head>
 <body>
-<script src="https://unpkg.com/feather-icons">
-</script>
 
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-    <div class="logo-area">
-        <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">
-            <img src="https://i.ibb.co/dJH3B61v/59693-Photoroom.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        <div class="logo-area">
+            <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">
+                <img src="https://i.ibb.co/dJH3B61v/59693-Photoroom.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            </div>
+            <div class="logo-text">
+                <h2>My Hub</h2>
+                <p>Play with me</p>
+            </div>
         </div>
-        <div class="logo-text">
-            <h2>My Hub</h2>
-            <p>P l a y   w i t h   m e</p>
-        </div>
+        <button class="close-sidebar-btn" onclick="toggleMenu()">✕</button>
     </div>
-    <button class="close-sidebar-btn" onclick="toggleMenu()">✕</button>
-</div>
     
     <div class="sidebar-links">
-    <a href="index.html" class="active">
-        <span class="icon"><i data-feather="home"></i></span> Home
-    </a>
-    <a href="popular.html">
-        <span class="icon"><i data-feather="trending-up"></i></span> Popular
-    </a>
-    <a href="models.html">
-        <span class="icon"><i data-feather="users"></i></span> Models
-    </a>
-    <a href="categories.html">
-        <span class="icon"><i data-feather="film"></i></span> Categories
-    </a>
-    <a href="search.html">
-        <span class="icon"><i data-feather="search"></i></span> Search
-    </a>
-    <a href="vip.html" style="color: gold;">
-        <span class="icon"><i data-feather="award"></i></span> VIP Videos
-    </a>
+        <a href="index.html" class="active">
+            <span class="icon"><i data-feather="home"></i></span> Home
+        </a>
+        <a href="popular.html">
+            <span class="icon"><i data-feather="trending-up"></i></span> Popular
+        </a>
+        <a href="models.html">
+            <span class="icon"><i data-feather="users"></i></span> Models
+        </a>
+        <a href="categories.html">
+            <span class="icon"><i data-feather="film"></i></span> Categories
+        </a>
+        <a href="search.html">
+            <span class="icon"><i data-feather="search"></i></span> Search
+        </a>
+        <a href="vip.html" style="color: gold;">
+            <span class="icon"><i data-feather="award"></i></span> VIP Videos
+        </a>
 
-    <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+        <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
 
-    <a href="login.html" id="navLogin" style="color: #00d2ff;">
-        <span class="icon"><i data-feather="key"></i></span> Login
-    </a>
-    <a href="account.html" id="navAccount" style="display: none; color: #00ff88;">
-        <span class="icon"><i data-feather="settings"></i></span> My Account
-    </a>
-</div>
+        <a href="login.html" id="navLogin" style="color: #00d2ff;">
+            <span class="icon"><i data-feather="key"></i></span> Login
+        </a>
+        <a href="account.html" id="navAccount" style="display: none; color: #00ff88;">
+            <span class="icon"><i data-feather="settings"></i></span> My Account
+        </a>
+    </div>
 </div>
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
@@ -92,10 +90,14 @@
     <video id="mainPlayer" controls playsinline></video>
 </div>
 
-<!-- Plyr JS -->
+<!-- Plyr JS & Feather Icons -->
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<script src="https://unpkg.com/feather-icons"></script>
 
 <script>
+    // Feather Icons အလုပ်လုပ်အောင်
+    feather.replace();
+
     const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
     let player; 
 
@@ -164,12 +166,11 @@
         const modal = document.getElementById('playerModal');
         const video = document.getElementById('mainPlayer');
         
-        // 🔴 Worker ID
         let streamBaseUrl = "";
         if (workerId == 2) {
-            streamBaseUrl = "https://myapp.8tetaun9.workers.dev"; // Worker 2
+            streamBaseUrl = "https://myapp.8tetaun9.workers.dev";
         } else {
-            streamBaseUrl = "https://myhubapp.dathalay1.workers.dev"; // Worker 1 (Default)
+            streamBaseUrl = "https://myhubapp.dathalay1.workers.dev";
         }
 
         const streamUrl = `${streamBaseUrl}/stream?file_id=${encodeURIComponent(fileId)}`;
@@ -187,7 +188,6 @@
         video.src = streamUrl;
         player.play().catch(e => console.log("Autoplay blocked", e));
 
-        // Views API 
         fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -206,10 +206,5 @@
 
     loadVideos();
 </script>
-<script src="https://unpkg.com/feather-icons"></script>
-<script>
-        feather.replace();
-    </script>
-
 </body>
 </html>
