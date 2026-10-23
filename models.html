@@ -17,20 +17,36 @@
             <h2>MyVideo</h2>
             <p>Premium Streaming</p>
         </div>
+<div class="sidebar-links">
+    <a href="index.html">
+        <span class="icon"><i data-feather="home"></i></span> Home
+    </a>
+    <a href="popular.html">
+        <span class="icon"><i data-feather="trending-up"></i></span> Popular
+    </a>
+    <a href="models.html">
+        <span class="icon"><i data-feather="users"></i></span> Models
+    </a>
+    <a href="categories.html">
+        <span class="icon"><i data-feather="film"></i></span> Categories
+    </a>
+    <a href="search.html">
+        <span class="icon"><i data-feather="search"></i></span> Search
+    </a>
+    <a href="vip.html" style="color: gold;">
+        <span class="icon"><i data-feather="award"></i></span> VIP Videos
+    </a>
 
-        <div class="sidebar-links">
-            <a href="index.html"><span class="icon">🏠</span> Home </a>
-            <a href="models.html" class="active"><span class="icon">👤</span> Models</a>
-            <a href="categories.html"><span class="icon">🎬</span> Categories</a>
-            <a href="popular.html" style="color: #00ff88;"><span class="icon">🔥</span> Popular</a>
-            <a href="vip.html" style="color: gold;"><span class="icon">👑</span> VIP Videos</a>
-            
-            <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
-            
-            <a href="login.html" id="navLogin" style="color: #00d2ff;"><span class="icon">🔑</span> Login</a>
-            <a href="account.html" id="navAccount" style="display: none; color: #00ff88;"><span class="icon">⚙️</span> My Account</a>
-        </div>
-    </div>
+<div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+
+    <a href="login.html" id="navLogin" style="color: #00d2ff;">
+        <span class="icon"><i data-feather="key"></i></span> Login
+    </a>
+    <a href="account.html" id="navAccount" style="display: none; color: #00ff88;">
+        <span class="icon"><i data-feather="settings"></i></span> My Account
+    </a>
+</div>
+</div>
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <!-- Navbar -->
@@ -130,6 +146,11 @@
         }
 
         loadModels();
+    </script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <script>
+        feather.replace();
     </script>
 </body>
 </html>
