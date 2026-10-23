@@ -89,8 +89,8 @@ a { text-decoration: none; color: inherit; }
     display: block;
 }
 
-.sidebar-header h2 { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); position: relative; z-index: 1; margin-top:5px; margin-bottom:8px; }
-.sidebar-header p { font-size: 12px; color: var(--primary); letter-spacing: 1px; position: relative; z-index: 1; font-weight: bold; white-space:pre;}
+.sidebar-header h2 { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); position: relative; z-index: 1; margin-bottom:10px; }
+.sidebar-header p { font-size: 12px; color: var(--primary); letter-spacing: 1px; position: relative; z-index: 1; font-weight: bold; white-space:pre;margin-top:5px}
 
 .sidebar-links { padding: 20px 15px; flex-grow: 1; overflow-y: auto; z-index: 1; }
 .sidebar-links::-webkit-scrollbar { width: 0; }
