@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Search - Premium Videos</title>
+    <title>Search</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -48,8 +48,8 @@
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">👤</div>
-        <h2>MyVideo</h2>
-        <p>Premium Streaming</p>
+        <h2>My Hub</h2>
+        <p>Play with Me</p>
     </div>
     
     <div class="sidebar-links">
@@ -129,10 +129,10 @@
     const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
     let player; 
 
-    // 🔴 Feather Icons ကို အလုပ်လုပ်ခိုင်းမယ်
+    // Feather 
     feather.replace();
 
-    // Sidebar စစ်ဆေးခြင်း
+    // Sidebar Check 
     if (localStorage.getItem('username')) {
         document.getElementById('navLogin').style.display = 'none';
         document.getElementById('navAccount').style.display = 'flex'; 
@@ -186,22 +186,12 @@
             const models = await modelsRes.json();
             const categories = await categoriesRes.json();
 
-            // ရှာလို့ တွေ့တာတွေကို သိမ်းမယ်
+            
             let resultHTML = '';
 
-            // ၁။ ဗီဒီယိုတွေ ရှာမယ်
-            const matchedVideos = videos.filter(v => v.title.toLowerCase().includes(query));
-            if (matchedVideos.length > 0) {
-                resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin-top: 10px;">Videos</h3>`;
-                resultHTML += matchedVideos.map(v => `
-                    <div class="card video-card" onclick="playVideo('${v.file_id}', ${v.id}, ${v.worker_id})">
-                        <video src="${v.preview_url || ''}" autoplay loop muted playsinline></video>
-                        <div class="title">${v.title}</div>
-                    </div>
-                `).join('');
-            }
+            
 
-            // ၂။ မော်ဒယ်တွေ ရှာမယ်
+            // Model 
             const matchedModels = models.filter(m => m.name.toLowerCase().includes(query));
             if (matchedModels.length > 0) {
                 resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin-top: 10px;">Models</h3>`;
@@ -216,7 +206,7 @@
                 `).join('');
             }
 
-            // ၃။ Category တွေ ရှာမယ်
+            // Category 
             const matchedCategories = categories.filter(c => c.name.toLowerCase().includes(query));
             if (matchedCategories.length > 0) {
                 resultHTML += `<h3 style="grid-column: span 3; color: var(--primary); margin-top: 10px;">Categories</h3>`;
@@ -231,7 +221,19 @@
                 `).join('');
             }
 
-            // ရလဒ် မရှိရင်
+            // Video 
+            const matchedVideos = videos.filter(v => v.title.toLowerCase().includes(query));
+            if (matchedVideos.length > 0) {
+                resultHTML += `<h3 style="grid-column: span 2; color: var(--primary); margin-top: 10px;">Videos</h3>`;
+                resultHTML += matchedVideos.map(v => `
+                    <div class="card video-card" onclick="playVideo('${v.file_id}', ${v.id}, ${v.worker_id})">
+                        <video src="${v.preview_url || ''}" autoplay loop muted playsinline></video>
+                        <div class="title">${v.title}</div>
+                    </div>
+                `).join('');
+            }
+
+            // No results 
             if (resultHTML === '') {
                 resultsDiv.innerHTML = `<div style="grid-column: span 3; text-align: center; color: #888; margin-top: 20px;">No results found for "${query}"</div>`;
             } else {
@@ -244,7 +246,7 @@
         }
     }
 
-    // 🔴 ဗီဒီယိုဖွင့်ခြင်း
+    // 🔴 play video
     function playVideo(fileId, videoId, workerId) {
         const modal = document.getElementById('playerModal');
         const video = document.getElementById('mainPlayer');
@@ -271,7 +273,7 @@
         video.src = streamUrl;
         player.play().catch(e => console.log("Autoplay blocked", e));
 
-        // Views တိုးစေမယ့် API
+        // Views API
         fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
