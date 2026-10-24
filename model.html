@@ -11,7 +11,7 @@
 </head>
 <body>
     
-    <!-- Sidebar -->
+<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo-area">
@@ -20,206 +20,208 @@
             </div>
             <div class="logo-text">
                 <h2>My Hub</h2>
-                <p>Play  with  me</p>
+                <p>Play with me</p>
             </div>
         </div>
         <button class="close-sidebar-btn" onclick="toggleMenu()">✕</button>
     </div>
         
-        <div class="sidebar-links">
-    <a href="index.html">
-        <span class="icon"><i data-feather="home"></i></span> Home
-    </a>
-    <a href="popular.html">
-        <span class="icon"><i data-feather="trending-up"></i></span> Popular
-    </a>
-    <a href="models.html" class="active">
-        <span class="icon"><i data-feather="users"></i></span> Models
-    </a>
-    <a href="categories.html">
-        <span class="icon"><i data-feather="film"></i></span> Categories
-    </a>
-    <a href="search.html">
-        <span class="icon"><i data-feather="search"></i></span> Search
-    </a>
-    <a href="vip.html" style="color: gold;">
-        <span class="icon"><i data-feather="award"></i></span> VIP Videos
-    </a>
+    <div class="sidebar-links">
+        <a href="index.html">
+            <span class="icon"><i data-feather="home"></i></span> Home
+        </a>
+        <a href="popular.html">
+            <span class="icon"><i data-feather="trending-up"></i></span> Popular
+        </a>
+        <a href="models.html" class="active">
+            <span class="icon"><i data-feather="users"></i></span> Models
+        </a>
+        <a href="categories.html">
+            <span class="icon"><i data-feather="film"></i></span> Categories
+        </a>
+        <a href="search.html">
+            <span class="icon"><i data-feather="search"></i></span> Search
+        </a>
+        <a href="vip.html" style="color: gold;">
+            <span class="icon"><i data-feather="award"></i></span> VIP Videos
+        </a>
 
-    <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+        <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
 
-    <a href="login.html" id="navLogin" style="color: #00d2ff;">
-        <span class="icon"><i data-feather="key"></i></span> Login
-    </a>
-    <a href="account.html" id="navAccount" style="display: none; color: #00ff88;">
-        <span class="icon"><i data-feather="settings"></i></span> My Account
-    </a>
+        <a href="login.html" id="navLogin" style="color: #00d2ff;">
+            <span class="icon"><i data-feather="key"></i></span> Login
+        </a>
+        <a href="account.html" id="navAccount" style="display: none; color: #00ff88;">
+            <span class="icon"><i data-feather="settings"></i></span> My Account
+        </a>
+    </div>
 </div>
-    </div>
-    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-    <!-- Navbar -->
-    <div class="navbar">
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <a href="models.html" style="color: white; text-decoration: none; font-size: 24px; margin-right: 10px;">&#8592;</a>
-        <h1 class="logo" id="pageTitle">Videos</h1>
-    </div>
+<!-- Navbar -->
+<div class="navbar">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <a href="models.html" style="color: white; text-decoration: none; font-size: 24px; margin-right: 10px;">&#8592;</a>
+    <h1 class="logo" id="pageTitle">Videos</h1>
+</div>
 
-    <!-- Content -->
-    <div class="container">
-        <div class="grid video-grid" id="videoGrid">
+<!-- Content -->
+<div class="container">
+    <div class="grid video-grid" id="videoGrid">
+        <div class="loading-wrapper" style="grid-column: span 2;">
+            <div class="spinner"></div>
+            <p>Please Wait . . .</p>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Back Button -->
+<a href="javascript:history.back()" class="floating-back-btn">
+    <i data-feather="arrow-left"></i>
+</a>
+
+<!-- Custom Error Popup -->
+<div id="customPopup">
+    <div class="popup-content">
+        <div class="popup-icon">⚠️</div>
+        <div class="popup-title">Error</div>
+        <div class="popup-message" id="popupMsg">Cannot connect to the server</div>
+        <button class="popup-btn" onclick="retryLoad()">Retry</button>
+    </div>
+</div>
+
+<!-- Player Modal -->
+<div id="playerModal">
+    <button id="closeBtn" onclick="closePlayer()">✕</button>
+    <video id="mainPlayer" controls playsinline></video>
+</div>
+
+<!-- Plyr JS -->
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
+<script>
+    const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
+    const urlParams = new URLSearchParams(window.location.search);
+    const modelId = urlParams.get('id');
+    const modelName = urlParams.get('name');
+    let player; 
+
+    if(modelName) document.getElementById('pageTitle').innerText = modelName;
+
+    if (localStorage.getItem('username')) {
+        document.getElementById('navLogin').style.display = 'none';
+        document.getElementById('navAccount').style.display = 'flex'; 
+        
+        const savedPic = localStorage.getItem('profile_pic');
+        if (savedPic) {
+            document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    }
+
+    function toggleMenu() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('show');
+    }
+
+    function showErrorPopup(message) {
+        document.getElementById('popupMsg').innerText = message;
+        document.getElementById('customPopup').style.display = 'flex';
+    }
+
+    function retryLoad() {
+        document.getElementById('customPopup').style.display = 'none';
+        document.getElementById('videoGrid').innerHTML = `
             <div class="loading-wrapper" style="grid-column: span 2;">
                 <div class="spinner"></div>
                 <p>Please Wait . . .</p>
-            </div>
-        </div>
-    </div>
+            </div>`;
+        loadVideos();
+    }
 
-    <!-- Custom Error Popup -->
-    <div id="customPopup">
-        <div class="popup-content">
-            <div class="popup-icon">⚠️</div>
-            <div class="popup-title">Error</div>
-            <div class="popup-message" id="popupMsg">Cannot connect to the server</div>
-            <button class="popup-btn" onclick="retryLoad()">Retry</button>
-        </div>
-    </div>
-
-    <!-- Player Modal -->
-    <div id="playerModal">
-        <button id="closeBtn" onclick="closePlayer()">✕</button>
-        <video id="mainPlayer" controls playsinline></video>
-    </div>
-
-    <!-- Plyr JS -->
-    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-    
-    <script>
-        const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
-        const urlParams = new URLSearchParams(window.location.search);
-        const modelId = urlParams.get('id');
-        const modelName = urlParams.get('name');
-        let player; 
-
-        if(modelName) document.getElementById('pageTitle').innerText = modelName;
-
-        // 🔴 Sidebar
-        if (localStorage.getItem('username')) {
-            document.getElementById('navLogin').style.display = 'none';
-            document.getElementById('navAccount').style.display = 'flex'; 
-            
-            const savedPic = localStorage.getItem('profile_pic');
-            if (savedPic) {
-                document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-            }
+    async function loadVideos() {
+        if(!modelId) {
+            document.getElementById('videoGrid').innerHTML = '<p style="grid-column: span 2; text-align:center;">Model ID Error</p>';
+            return;
         }
 
-        function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('show');
-        }
+        const grid = document.getElementById('videoGrid');
+        
+        try {
+            const res = await fetch(`${API_URL}/api/videos/model?id=${modelId}`);
+            if (!res.ok) throw new Error("Server Error");
 
-        function showErrorPopup(message) {
-            document.getElementById('popupMsg').innerText = message;
-            document.getElementById('customPopup').style.display = 'flex';
-        }
+            const videos = await res.json();
+            grid.innerHTML = ''; 
 
-        function retryLoad() {
-            document.getElementById('customPopup').style.display = 'none';
-            document.getElementById('videoGrid').innerHTML = `
-                <div class="loading-wrapper" style="grid-column: span 2;">
-                    <div class="spinner"></div>
-                    <p>Please Wait . . .</p>
-                </div>`;
-            loadVideos();
-        }
-
-        async function loadVideos() {
-            if(!modelId) {
-                document.getElementById('videoGrid').innerHTML = '<p style="grid-column: span 2; text-align:center;">Model ID Error</p>';
+            if(videos.length === 0) {
+                grid.innerHTML = '<p style="grid-column: span 2; text-align:center; color:#888;">No Videos for this Model</p>';
                 return;
             }
 
-            const grid = document.getElementById('videoGrid');
-            
-            try {
-                const res = await fetch(`${API_URL}/api/videos/model?id=${modelId}`);
-                if (!res.ok) throw new Error("Server Error");
-
-                const videos = await res.json();
-                grid.innerHTML = ''; 
-
-                if(videos.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: span 2; text-align:center; color:#888;">No Videos for this Model</p>';
-                    return;
-                }
-
-                videos.forEach(video => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => playVideo(video.file_id, video.id, video.worker_id);
-                    card.innerHTML = `
-                        <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
-                        <div class="title">${video.title}</div>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (error) {
-                grid.innerHTML = ''; 
-                showErrorPopup(error.message); 
-            }
+            videos.forEach(video => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => playVideo(video.file_id, video.id, video.worker_id);
+                card.innerHTML = `
+                    <video src="${video.preview_url || ''}" autoplay loop muted playsinline></video>
+                    <div class="title">${video.title}</div>
+                `;
+                grid.appendChild(card);
+            });
+        } catch (error) {
+            grid.innerHTML = ''; 
+            showErrorPopup(error.message); 
         }
-    //Play Video 
-        function playVideo(fileId, videoId, workerId) {
-    const modal = document.getElementById('playerModal');
-    const video = document.getElementById('mainPlayer');
-    
-    // 🔴 Worker ID အလိုက် Link ကို ရွေးမယ်
-    let streamBaseUrl = "";
-    if (workerId == 2) {
-        streamBaseUrl = "https://myapp.8tetaun9.workers.dev"; // Worker 2
-    } else {
-        streamBaseUrl = "https://myhubapp.dathalay1.workers.dev"; // Worker 1 (Default)
     }
 
-    const streamUrl = `${streamBaseUrl}/stream?file_id=${encodeURIComponent(fileId)}`;
-
-    modal.style.display = 'flex';
-
-    if (!player) {
-        player = new Plyr(video, {
-            controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-            settings: ['captions', 'quality', 'speed', 'loop'],
-            fullscreen: { enabled: true, fallback: true, iosNative: true }
-        });
-    }
-
-    video.src = streamUrl;
-    player.play().catch(e => console.log("Autoplay blocked", e));
-
-    // Views တိုးစေမယ့် API (ဒါက Main Worker ကိုပဲ ခေါ်မယ်)
-    fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: videoId })
-    }).catch(e => console.log("View count error", e));
-}
-
-        function closePlayer() {
-            const modal = document.getElementById('playerModal');
-            modal.style.display = 'none';
-            
-            if (player) { 
-                player.pause(); 
-            }
+    function playVideo(fileId, videoId, workerId) {
+        const modal = document.getElementById('playerModal');
+        const video = document.getElementById('mainPlayer');
+        
+        let streamBaseUrl = "";
+        if (workerId == 2) {
+            streamBaseUrl = "https://myapp.8tetaun9.workers.dev";
+        } else {
+            streamBaseUrl = "https://myhubapp.dathalay1.workers.dev";
         }
 
-        loadVideos();
-    </script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    
-    <script>
-        feather.replace();
-    </script>
+        const streamUrl = `${streamBaseUrl}/stream?file_id=${encodeURIComponent(fileId)}`;
+
+        modal.style.display = 'flex';
+
+        if (!player) {
+            player = new Plyr(video, {
+                controls: ['play-large', 'rewind', 'play','fast-forward', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                settings: ['captions', 'quality', 'speed', 'loop'],
+                fullscreen: { enabled: true, fallback: true, iosNative: true }
+            });
+        }
+
+        video.src = streamUrl;
+        player.play().catch(e => console.log("Autoplay blocked", e));
+
+        fetch(`https://myhubapp.dathalay1.workers.dev/api/videos/view`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: videoId })
+        }).catch(e => console.log("View count error", e));
+    }
+
+    function closePlayer() {
+        const modal = document.getElementById('playerModal');
+        modal.style.display = 'none';
+        
+        if (player) { 
+            player.pause(); 
+        }
+    }
+
+    loadVideos();
+</script>
+<script src="https://unpkg.com/feather-icons"></script>
+
+<script>
+    feather.replace();
+</script>
 </body>
 </html>
