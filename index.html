@@ -167,7 +167,7 @@
         const video = document.getElementById('mainPlayer');
         
         let streamBaseUrl = "";
-        if (workerId == 2) {
+        if (workerId === 2 || workerId == "2") {
             streamBaseUrl = "https://myapp.8tetaun9.workers.dev";
         } else {
             streamBaseUrl = "https://myhubapp.dathalay1.workers.dev";
