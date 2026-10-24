@@ -11,7 +11,6 @@
     <style>
         .account-container { padding: 20px; text-align: center; }
         
-        /* 🔴 Profile ပုံကို နှိပ်ရင် ပုံရွေးလို့ရအောင် ပြင်ထားတယ် */
         .profile-img { 
             width: 120px; height: 120px; border-radius: 50%; 
             background: var(--nav-bg); margin: 0 auto 20px; 
@@ -26,7 +25,7 @@
             position: absolute; bottom: 0; right: 0;
             background: var(--primary); width: 35px; height: 35px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 18px; border: 2px solid var(--nav-bg);
+            color: white; border: 2px solid var(--nav-bg);
         }
 
         .info-box { 
@@ -131,7 +130,7 @@
     
     <div class="profile-img" id="mainProfileImg" onclick="document.getElementById('fileInput').click()">
         👤
-        <div class="camera-icon">📷</div>
+        <div class="camera-icon"><i data-feather="camera" style="width: 18px; height: 18px;"></i></div>
     </div>
     
     <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
@@ -146,8 +145,12 @@
         <h3>Renew Key</h3>
         <p>Contact us via the buttons below to renew your key</p>
         <div class="btn-group">
-            <a href="viber://chat?number=+959xxxxxxxxx" class="btn btn-viber">Viber</a>
-            <a href="https://t.me/yourusername" class="btn btn-tg">Telegram</a>
+            <a href="viber://chat?number=+959xxxxxxxxx" class="btn btn-viber">
+                <i data-feather="phone-call" style="width: 18px; height: 18px;"></i> Viber
+            </a>
+            <a href="https://t.me/yourusername" class="btn btn-tg">
+                <i data-feather="send" style="width: 18px; height: 18px;"></i> Telegram
+            </a>
         </div>
     </div>
 
@@ -165,16 +168,14 @@
         document.getElementById('accUsername').innerText = localStorage.getItem('username');
         document.getElementById('accExpired').innerText = localStorage.getItem('expired_date');
         
-        // 🔴 Key ကို ပြမယ်
         const savedKey = localStorage.getItem('key_code');
         if (savedKey) {
             document.getElementById('accKey').innerText = savedKey;
         }
 
-        // 🔴 ပုံကို ပြမယ်
         const savedPic = localStorage.getItem('profile_pic');
         if (savedPic) {
-            document.getElementById('mainProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile"><div class="camera-icon">📷</div>`;
+            document.getElementById('mainProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile"><div class="camera-icon"><i data-feather="camera" style="width: 18px; height: 18px;"></i></div>`;
             document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
         }
     }
@@ -184,7 +185,6 @@
         document.getElementById('overlay').classList.toggle('show');
     }
 
-    // 🔴 ပုံရွေးလိုက်တာနဲ့ အလုပ်လုပ်မယ့် Function
     function handleImageUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -200,9 +200,10 @@
             
             localStorage.setItem('profile_pic', base64Image);
             
-            document.getElementById('mainProfileImg').innerHTML = `<img src="${base64Image}" alt="Profile"><div class="camera-icon">📷</div>`;
+            document.getElementById('mainProfileImg').innerHTML = `<img src="${base64Image}" alt="Profile"><div class="camera-icon"><i data-feather="camera" style="width: 18px; height: 18px;"></i></div>`;
             document.getElementById('sidebarProfileImg').innerHTML = `<img src="${base64Image}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
             
+            feather.replace(); 
             alert("Profile Picture Updated!");
             document.getElementById('fileInput').value = ''; 
         };
@@ -227,7 +228,7 @@
         localStorage.removeItem('username');
         localStorage.removeItem('expired_date');
         localStorage.removeItem('profile_pic');
-        localStorage.removeItem('key_code'); // Key ကိုပါ ဖျက်မယ်
+        localStorage.removeItem('key_code'); 
         
         window.location.href = 'index.html';
     }
