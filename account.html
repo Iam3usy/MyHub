@@ -5,20 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Account</title>
     
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* Account Page*/
         .account-container { padding: 20px; text-align: center; }
         
+        /* 🔴 Profile ပုံကို နှိပ်ရင် ပုံရွေးလို့ရအောင် ပြင်ထားတယ် */
         .profile-img { 
-            width: 100px; height: 100px; border-radius: 50%; 
+            width: 120px; height: 120px; border-radius: 50%; 
             background: var(--nav-bg); margin: 0 auto 20px; 
             display: flex; justify-content: center; align-items: center; 
             font-size: 45px; border: 3px solid var(--primary);
             box-shadow: 0 0 15px var(--primary-glow);
+            overflow: hidden; position: relative; cursor: pointer;
+        }
+        .profile-img img { width: 100%; height: 100%; object-fit: cover; }
+
+        .camera-icon {
+            position: absolute; bottom: 0; right: 0;
+            background: var(--primary); width: 35px; height: 35px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; border: 2px solid var(--nav-bg);
         }
 
         .info-box { 
@@ -65,125 +73,168 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
+<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo-area">
-            <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden;">
+            <div class="profile-img" id="sidebarProfileImg" style="overflow: hidden; width: 45px; height: 45px; border: none; box-shadow: none;">
                 <img src="https://i.ibb.co/dJH3B61v/59693-Photoroom.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
             </div>
             <div class="logo-text">
                 <h2>My Hub</h2>
-                <p>Play  with  me</p>
+                <p>Play with me</p>
             </div>
         </div>
         <button class="close-sidebar-btn" onclick="toggleMenu()">✕</button>
     </div>
         
     <div class="sidebar-links">
-    <a href="index.html">
-        <span class="icon"><i data-feather="home"></i></span> Home 
-    </a>
-    <a href="models.html" class="active">
-        <span class="icon"><i data-feather="users"></i></span> Models
-    </a>
-    <a href="categories.html">
-        <span class="icon"><i data-feather="film"></i></span> Categories
-    </a>
-    <a href="popular.html" style="color: #00ff88;">
-        <span class="icon"><i data-feather="trending-up"></i></span> Popular
-    </a>
-    <a href="vip.html" style="color: gold;">
-        <span class="icon"><i data-feather="award"></i></span> VIP Videos
-    </a>
-    
-    <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
-    
-    <a href="login.html" id="navLogin" style="color: #00d2ff;">
-        <span class="icon"><i data-feather="key"></i></span> Login
-    </a>
-    <a href="account.html" id="navAccount" class="active" style="display: none; color: #00ff88;">
-        <span class="icon"><i data-feather="settings"></i></span> My Account
-    </a>
+        <a href="index.html">
+            <span class="icon"><i data-feather="home"></i></span> Home 
+        </a>
+        <a href="popular.html">
+            <span class="icon"><i data-feather="trending-up"></i></span> Popular
+        </a>
+        <a href="models.html">
+            <span class="icon"><i data-feather="users"></i></span> Models
+        </a>
+        <a href="categories.html">
+            <span class="icon"><i data-feather="film"></i></span> Categories
+        </a>
+        <a href="search.html">
+            <span class="icon"><i data-feather="search"></i></span> Search
+        </a>
+        <a href="vip.html" style="color: gold;">
+            <span class="icon"><i data-feather="award"></i></span> VIP Videos
+        </a>
+        
+        <div style="border-top: 1px solid #333; margin: 15px 10px;"></div>
+        
+        <a href="login.html" id="navLogin" style="color: #00d2ff;">
+            <span class="icon"><i data-feather="key"></i></span> Login
+        </a>
+        <a href="account.html" id="navAccount" class="active" style="display: none; color: #00ff88;">
+            <span class="icon"><i data-feather="settings"></i></span> My Account
+        </a>
     </div>
-    </div>
+</div>
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<!-- Navbar -->
+<div class="navbar">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <h1 class="logo">My Account</h1>
+</div>
+
+<!-- Content -->
+<div class="account-container">
     
-
-    <!-- Navbar -->
-    <div class="navbar">
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <h1 class="logo">My Account</h1>
+    <div class="profile-img" id="mainProfileImg" onclick="document.getElementById('fileInput').click()">
+        👤
+        <div class="camera-icon">📷</div>
+    </div>
+    
+    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+    
+    <div class="info-box">
+        <p>Username <span id="accUsername">...</span></p>
+        <p>VIP Key <span id="accKey">******</span></p>
+        <p>Expired <span id="accExpired" style="color: var(--primary);">...</span></p>
     </div>
 
-    <!-- Content -->
-    <div class="account-container">
-        <div class="profile-img">👤</div>
-        
-        <div class="info-box">
-            <p>Username <span id="accUsername">...</span></p>
-            <p>VIP Key <span id="accKey">******</span></p>
-            <p>Expired <span id="accExpired" style="color: var(--primary);">...</span></p>
+    <div class="renew-box">
+        <h3>Renew Key</h3>
+        <p>Contact us via the buttons below to renew your key</p>
+        <div class="btn-group">
+            <a href="viber://chat?number=+959xxxxxxxxx" class="btn btn-viber">Viber</a>
+            <a href="https://t.me/yourusername" class="btn btn-tg">Telegram</a>
         </div>
-
-        <div class="renew-box">
-            <h3>Renew Key</h3>
-            <p>Contact us via the buttons below to renew your key</p>
-            <div class="btn-group">
-                <!-- Viber and Telegram Link-->
-                <a href="viber://chat?number=+959xxxxxxxxx" class="btn btn-viber">Viber</a>
-                <a href="https://t.me/yourusername" class="btn btn-tg">Telegram</a>
-            </div>
-        </div>
-
-        <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
-    <script>
-        const API_URL = "https://myhubapp.dathalay1.workers.dev"; // မင်း Worker Link
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<script>
+    const API_URL = "https://myhubapp.dathalay1.workers.dev"; 
+    
+    if (!localStorage.getItem('username')) {
+        window.location.href = 'login.html'; 
+    } else {
+        document.getElementById('navLogin').style.display = 'none';
+        document.getElementById('navAccount').style.display = 'flex';
+        document.getElementById('accUsername').innerText = localStorage.getItem('username');
+        document.getElementById('accExpired').innerText = localStorage.getItem('expired_date');
         
-        // Account Page ကို ဝင်လာတာနဲ့ အချက်အလက်တွေ စစ်မယ်
-        if (!localStorage.getItem('username')) {
-            window.location.href = 'login.html'; // မဝင်ထားရင် Login ပို့မယ်
-        } else {
-            document.getElementById('navLogin').style.display = 'none';
-            document.getElementById('navAccount').style.display = 'flex';
-            document.getElementById('accUsername').innerText = localStorage.getItem('username');
-            document.getElementById('accExpired').innerText = localStorage.getItem('expired_date');
+        // 🔴 Key ကို ပြမယ်
+        const savedKey = localStorage.getItem('key_code');
+        if (savedKey) {
+            document.getElementById('accKey').innerText = savedKey;
         }
 
-        function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('show');
+        // 🔴 ပုံကို ပြမယ်
+        const savedPic = localStorage.getItem('profile_pic');
+        if (savedPic) {
+            document.getElementById('mainProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile"><div class="camera-icon">📷</div>`;
+            document.getElementById('sidebarProfileImg').innerHTML = `<img src="${savedPic}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    }
+
+    function toggleMenu() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('show');
+    }
+
+    // 🔴 ပုံရွေးလိုက်တာနဲ့ အလုပ်လုပ်မယ့် Function
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            alert("Image size must be less than 2MB. Please choose a smaller image.");
+            return;
         }
 
-        async function logout() {
-            const username = localStorage.getItem('username');
-            const btn = document.querySelector('.logout-btn');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Image = e.target.result; 
             
-            btn.innerText = "Please Wait...";
-            btn.disabled = true;
+            localStorage.setItem('profile_pic', base64Image);
+            
+            document.getElementById('mainProfileImg').innerHTML = `<img src="${base64Image}" alt="Profile"><div class="camera-icon">📷</div>`;
+            document.getElementById('sidebarProfileImg').innerHTML = `<img src="${base64Image}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            
+            alert("Profile Picture Updated!");
+            document.getElementById('fileInput').value = ''; 
+        };
+        reader.readAsDataURL(file); 
+    }
 
-            // Delete Device ID
-            try {
-                await fetch(`${API_URL}/api/logout`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ username })
-                });
-            } catch (e) { console.log(e); }
+    async function logout() {
+        const username = localStorage.getItem('username');
+        const btn = document.querySelector('.logout-btn');
+        
+        btn.innerText = "Please Wait...";
+        btn.disabled = true;
 
-            
-            localStorage.removeItem('username');
-            localStorage.removeItem('expired_date');
-            
-            
-            window.location.href = 'index.html';
-        }
-    </script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script>
-        feather.replace();
-    </script>
+        try {
+            await fetch(`${API_URL}/api/logout`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username })
+            });
+        } catch (e) { console.log(e); }
+
+        localStorage.removeItem('username');
+        localStorage.removeItem('expired_date');
+        localStorage.removeItem('profile_pic');
+        localStorage.removeItem('key_code'); // Key ကိုပါ ဖျက်မယ်
+        
+        window.location.href = 'index.html';
+    }
+</script>
+<script src="https://unpkg.com/feather-icons"></script>
+<script>
+    feather.replace();
+</script>
 </body>
 </html>
