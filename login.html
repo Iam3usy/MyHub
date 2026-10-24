@@ -30,7 +30,7 @@
                 <img src="https://i.ibb.co/dJH3B61v/59693-Photoroom.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
             </div>
             <div class="logo-text">
-                <h2>My Hub</h2>
+                <h2>My  Hub</h2>
                 <p>Play  with  me</p>
             </div>
         </div>
@@ -81,7 +81,15 @@
         <h2 style="text-align: center; color: var(--primary); margin-bottom: 20px;">Login</h2>
         
         <input type="text" id="username" placeholder="Username" onkeypress="handleEnter(event)">
-        <input type="password" id="key_code" placeholder="VIP Key" onkeypress="handleEnter(event)">
+        
+        <!-- 🔴 VIP Key အတွက် မျက်လုံးလေး ထည့်ထားပါတယ် -->
+        <div style="position: relative; width: 100%;">
+            <input type="password" id="key_code" placeholder="VIP Key" onkeypress="handleEnter(event)" style="margin-bottom: 0; padding-right: 40px; width: 100%;">
+            <span onclick="togglePassword()" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;">
+                <i data-feather="eye" id="eyeIcon"></i>
+            </span>
+        </div>
+        <div style="height: 15px;"></div>
         
         <button onclick="login()" id="loginBtn">Login</button>
         
@@ -110,6 +118,21 @@
     function toggleMenu() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('overlay').classList.toggle('show');
+    }
+
+    // 🔴 မျက်လုံးလေး နှိပ်ရင် Key ကို ဖျောက်/ပြ လုပ်ပေးမယ့် Function
+    function togglePassword() {
+        const keyInput = document.getElementById('key_code');
+        const eyeIcon = document.getElementById('eyeIcon');
+        
+        if (keyInput.type === "password") {
+            keyInput.type = "text";
+            eyeIcon.setAttribute("data-feather", "eye-off");
+        } else {
+            keyInput.type = "password";
+            eyeIcon.setAttribute("data-feather", "eye");
+        }
+        feather.replace();
     }
 
     function handleEnter(e) {
@@ -156,6 +179,9 @@
             if (res.ok) {
                 localStorage.setItem('username', data.user.username);
                 localStorage.setItem('expired_date', data.user.expired_date);
+                
+                // 🔴 Key ကို သိမ်းထားတဲ့ ကုဒ် (အကောင့်ထဲမှာ ပြဖို့)
+                localStorage.setItem('key_code', key_code);
                 
                 if (!localStorage.getItem('profile_pic') && data.user.profile_pic) {
                     localStorage.setItem('profile_pic', data.user.profile_pic);
