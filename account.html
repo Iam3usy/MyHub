@@ -11,29 +11,60 @@
     <style>
         .account-container { padding: 20px; text-align: center; }
         
+        /* Profile ပုံ အဝိုင်းနဲ့ ဘောင် */
         .profile-img { 
-            width: 120px; height: 120px; border-radius: 50%; 
-            background: var(--nav-bg); margin: 0 auto 20px; 
-            display: flex; justify-content: center; align-items: center; 
-            font-size: 45px; border:none;
-            box-shadow: 0 0 15px var(--primary-glow);
-            overflow: hidden; position: relative; cursor: pointer;
+            width: 120px; 
+            height: 120px; 
+            border-radius: 50%; 
+            background: var(--nav-bg); 
+            margin: 0 auto 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 45px; 
+            border: 3px solid var(--primary); 
+            box-shadow: 0 0 15px var(--primary-glow); 
+            
+            /* 🔴 ကင်မရာကို အပြင်ထွက်ခွင့်ပြုရန် */
+            overflow: visible; 
+            position: relative; 
+            cursor: pointer;
+            z-index: 1; 
         }
-        .profile-img img { width: 100%; height: 100%; object-fit: cover; }
 
+        /* ပုံလေးကို အဝိုင်းထဲမှာပဲ ထားရန် */
+        .profile-img img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            border-radius: 50%; 
+        }
+
+        /* 🔴 ကင်မရာလေး (အပေါ်ဆုံး Layer) */
         .camera-icon {
-            position: absolute; bottom: 0; right: 0;
-            background: var(--primary); width: 35px; height: 35px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: white; border: 2px solid var(--nav-bg);
+            position: absolute; 
+            bottom: -5px; 
+            right: -5px;  
+            background: var(--primary); 
+            width: 35px; 
+            height: 35px;
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: white; 
+            border: 2px solid var(--nav-bg);
+            z-index: 10; 
         }
 
+        /* ကင်မရာ Icon အရွယ်အစား */
         .camera-icon svg {
-            width: 18px;
-            height: 18px;
+            width: 20px; 
+            height: 20px;
             display: block;
         }
 
+        /* Info Box */
         .info-box { 
             background: var(--nav-bg); padding: 20px; border-radius: 15px; 
             margin-bottom: 20px; text-align: left; 
@@ -48,6 +79,7 @@
         .info-box p:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
         .info-box span { color: var(--text-main); font-weight: bold; }
 
+        /* Renew Box */
         .renew-box { 
             background: var(--nav-bg); padding: 20px; border-radius: 15px; 
             margin-bottom: 20px; border: 1px solid var(--border-color);
@@ -56,6 +88,7 @@
         .renew-box h3 { color: var(--primary); margin-top: 0; margin-bottom: 10px; text-align: left; }
         .renew-box p { font-size: 14px; color: var(--text-muted); text-align: left; margin-bottom: 15px; }
         
+        /* Buttons */
         .btn-group { display: flex; gap: 15px; justify-content: center; }
         .btn { 
             flex: 1; padding: 12px; border-radius: 10px; text-decoration: none; 
@@ -66,6 +99,7 @@
         .btn-viber { background: #7360f2; box-shadow: 0 4px 10px rgba(115, 96, 242, 0.3); }
         .btn-tg { background: #0088cc; box-shadow: 0 4px 10px rgba(0, 136, 204, 0.3); }
         
+        /* Logout Button */
         .logout-btn { 
             background: rgba(255, 51, 51, 0.1); 
             border: 1px solid #ff3333;
