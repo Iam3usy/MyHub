@@ -11,7 +11,7 @@
     <style>
         .account-container { padding: 20px; text-align: center; }
         
-        /* Profile ပုံ အဝိုင်းနဲ့ ဘောင် */
+        /* Profile*/
         .profile-img { 
             width: 120px; 
             height: 120px; 
@@ -25,14 +25,13 @@
             border: 3px solid var(--primary); 
             box-shadow: 0 0 15px var(--primary-glow); 
             
-            /* 🔴 ကင်မရာကို အပြင်ထွက်ခွင့်ပြုရန် */
+            
             overflow: visible; 
             position: relative; 
             cursor: pointer;
             z-index: 1; 
         }
 
-        /* ပုံလေးကို အဝိုင်းထဲမှာပဲ ထားရန် */
         .profile-img img { 
             width: 100%; 
             height: 100%; 
@@ -40,7 +39,6 @@
             border-radius: 50%; 
         }
 
-        /* 🔴 ကင်မရာလေး (အပေါ်ဆုံး Layer) */
         .camera-icon {
             position: absolute; 
             bottom: -5px; 
@@ -57,7 +55,6 @@
             z-index: 10; 
         }
 
-        /* ကင်မရာ Icon အရွယ်အစား */
         .camera-icon svg {
             width: 20px; 
             height: 20px;
@@ -164,8 +161,10 @@
     <button class="menu-btn" onclick="toggleMenu()">☰</button>
     <h1 class="logo">My Account</h1>
 </div>
+    
+<input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
 
-<!-- Content -->
+    <!-- Content -->
 <div class="account-container">
     
     <div class="profile-img" id="mainProfileImg" onclick="document.getElementById('fileInput').click()">
@@ -173,8 +172,7 @@
         <div class="camera-icon"><i data-feather="camera" style="width: 18px; height: 18px;"></i></div>
     </div>
 
-    <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="handleImageUpload(event)">
-    
+
     <div class="info-box">
         <p>Username <span id="accUsername">...</span></p>
         <p>VIP Key <span id="accKey">******</span></p>
